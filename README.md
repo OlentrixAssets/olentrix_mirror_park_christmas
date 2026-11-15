@@ -1,5 +1,9 @@
 # [FREE] [MAP] Mirror Park Christmas
 
+> [!CAUTION]
+> **STILL BEING WORKED ON.** This map is a work in progress and things will keep changing.
+> If you're going to complain that it isn't ready, don't use it yet.
+
 Welcome to Mirror Park Christmas.
 
 A Christmas village on the hill above Mirror Park: wooden market cabins, an ice rink, a Ferris wheel, a big tree, a fireside lounge, and a little steam train that does laps of the whole thing.
