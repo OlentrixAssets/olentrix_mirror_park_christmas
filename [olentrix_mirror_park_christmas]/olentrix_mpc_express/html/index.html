@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>html, body { margin: 0; background: transparent; }</style>
+</head>
+<body>
+<script>
+let ac = null, master = null, chuff = null; const bufs = {}, loading = {};
+function ctx() {
+  if (!ac) { ac = new AudioContext(); master = ac.createGain(); master.connect(ac.destination); }
+  if (ac.state === 'suspended') ac.resume();
+  return ac;
+}
+function load(k) {
+  if (bufs[k]) return Promise.resolve(bufs[k]);
+  if (!loading[k]) loading[k] = fetch('audio/' + k + '.ogg').then(r => r.arrayBuffer()).then(b => ctx().decodeAudioData(b)).then(b => (bufs[k] = b));
+  return loading[k];
+}
+window.addEventListener('message', (e) => {
+  const d = e.data; if (!d || !d.t) return;
+  const c = ctx(); master.gain.setTargetAtTime(d.v || 0.5, c.currentTime, .3);
+  if (d.t === 'chuff') {
+    if (!chuff) {
+      const g = c.createGain(); g.gain.value = 0; g.connect(master); chuff = { g, src: null };
+      load('chuff').then(b => { const s = c.createBufferSource(); s.buffer = b; s.loop = true; s.connect(g); s.start(); chuff.src = s; });
+    }
+    chuff.g.gain.setTargetAtTime(d.g, c.currentTime, .25);
+    if (chuff.src) chuff.src.playbackRate.setTargetAtTime(d.r || 1, c.currentTime, .4);
+  } else if (d.t === 'bell') {
+    load('bell').then(b => { const s = c.createBufferSource(), g = c.createGain(); g.gain.value = d.g; s.buffer = b; s.connect(g).connect(master); s.start(); });
+  } else if (d.t === 'stop') {
+    if (chuff && chuff.src) { try { chuff.src.stop(); } catch (x) {} }
+    chuff = null;
+  }
+});
+</script>
+</body>
+</html>

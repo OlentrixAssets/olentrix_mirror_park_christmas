@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>html, body { margin: 0; background: transparent; }</style>
+</head>
+<body>
+<script>
+const SRC = { music: 'audio/music.ogg', bells: 'audio/bells.ogg', fire: 'audio/fire.ogg', cer: 'audio/ceremony.ogg' };
+const FROMTOP = { music: 1, passage_box: 1, globe_music: 1 };
+let ac = null, master = null;
+const ch = {}, bufs = {}, loading = {};
+let pl = null, pi = 0;
+
+function ctx() {
+  if (!ac) { ac = new AudioContext(); master = ac.createGain(); master.gain.value = 0; master.connect(ac.destination); }
+  if (ac.state === 'suspended') ac.resume();
+  return ac;
+}
+function load(k) {
+  if (bufs[k]) return Promise.resolve(bufs[k]);
+  if (!loading[k]) loading[k] = fetch(SRC[k]).then(r => r.arrayBuffer()).then(b => ctx().decodeAudioData(b)).then(b => (bufs[k] = b));
+  return loading[k];
+}
+function chan(k) {
+  if (!ch[k]) {
+    const c = ctx(), g = c.createGain(), p = c.createStereoPanner();
+    g.gain.value = 0; g.connect(p).connect(master);
+    ch[k] = { g, p, src: null, starting: false, quiet: 0 };
+  }
+  return ch[k];
+}
+function stopSrc(c) {
+  if (c && c.src) { try { c.src.stop(); } catch (e) {} c.src.disconnect(); c.src = null; }
+}
+function startLoop(k) {
+  const c = chan(k);
+  if (c.src || c.starting) return;
+  c.starting = true;
+  const f = k === 'music' && pl ? pl[pi % pl.length] : k;
+  if (!SRC[f]) SRC[f] = 'audio/' + f;
+  load(f).then(b => {
+    const s = ctx().createBufferSource(); s.buffer = b; s.loop = f === k; s.connect(c.g);
+    s.start(0, FROMTOP[k] ? 0 : Math.random() * b.duration); c.src = s; c.starting = false;
+    if (f !== k) s.onended = () => { if (c.src !== s) return; c.src = null; delete bufs[f]; delete loading[f]; pi++; startLoop(k); };
+  }).catch(() => { c.starting = false; if (f !== k) { pi++; setTimeout(() => startLoop(k), 1000); } });
+}
+
+window.addEventListener('message', (e) => {
+  const d = e.data;
+  if (!d || !d.t) return;
+  if (d.t === 'mix') {
+    if (d.f) for (const k in d.f) if (!SRC[k]) SRC[k] = 'audio/' + d.f[k];
+    if (d.pl && d.pl.length) pl = d.pl;
+    const now = ctx().currentTime;
+    master.gain.setTargetAtTime(d.v, now, 0.3);
+    for (const k in d.s) {
+      const [g, p] = d.s[k], c = chan(k);
+      c.g.gain.setTargetAtTime(g, now, 0.35); c.p.pan.setTargetAtTime(Math.max(-1, Math.min(1, p)), now, 0.2);
+      if (k === 'cer') continue;
+      if (g > 0.001) { c.quiet = 0; startLoop(k); } else if (c.src && ++c.quiet > 200) stopSrc(c);
+    }
+  } else if (d.t === 'cer') {
+    const c = chan('cer'); stopSrc(c);
+    const asked = performance.now();
+    load('cer').then(b => {
+      const at = d.at + (performance.now() - asked) / 1000;
+      if (at >= b.duration) return;
+      const s = ctx().createBufferSource(); s.buffer = b; s.connect(c.g); s.start(0, Math.max(0, at)); c.src = s;
+      s.onended = () => { if (c.src === s) c.src = null; };
+    });
+  } else if (d.t === 'cerstop') {
+    stopSrc(chan('cer'));
+  } else if (d.t === 'stop') {
+    for (const k in ch) stopSrc(ch[k]);
+  }
+});
+</script>
+</body>
+</html>

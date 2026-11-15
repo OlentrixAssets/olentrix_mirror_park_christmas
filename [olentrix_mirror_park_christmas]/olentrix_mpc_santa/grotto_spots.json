@@ -1,0 +1,129 @@
+{
+ "model": "xv_w_grotto",
+ "origin": [
+  1424.0,
+  -725.0,
+  66.17
+ ],
+ "yaw": -57.5,
+ "seat": {
+  "x": 1424.776,
+  "y": -724.506,
+  "z": 67.05,
+  "heading": 122.5,
+  "local": [
+   0.0,
+   0.92,
+   0.88
+  ],
+  "note": "top of the seat cushion, centre; Santa faces out of the grotto"
+ },
+ "lap": {
+  "x": 1424.521,
+  "y": -724.514,
+  "z": 67.2,
+  "heading": 122.5,
+  "local": [
+   -0.13,
+   0.7,
+   1.03
+  ],
+  "note": "over Santa's right thigh, on top of it"
+ },
+ "stand_left": {
+  "x": 1424.056,
+  "y": -723.636,
+  "z": 66.52,
+  "heading": 134.5,
+  "local": [
+   -1.12,
+   0.78,
+   0.35
+  ],
+  "note": "platform floor, photo-left of the throne (Santa's right)"
+ },
+ "stand_right": {
+  "x": 1425.26,
+  "y": -725.526,
+  "z": 66.52,
+  "heading": 110.5,
+  "local": [
+   1.12,
+   0.78,
+   0.35
+  ],
+  "note": "platform floor, photo-right of the throne (Santa's left)"
+ },
+ "exit_lap": {
+  "x": 1423.287,
+  "y": -724.719,
+  "z": 66.52,
+  "heading": 122.5,
+  "local": [
+   -0.62,
+   -0.45,
+   0.35
+  ],
+  "note": "platform floor at the front edge"
+ },
+ "exit_left": {
+  "x": 1423.019,
+  "y": -724.297,
+  "z": 66.52,
+  "heading": 122.5,
+  "local": [
+   -1.12,
+   -0.45,
+   0.35
+  ],
+  "note": "platform floor at the front edge"
+ },
+ "exit_right": {
+  "x": 1424.222,
+  "y": -726.186,
+  "z": 66.52,
+  "heading": 122.5,
+  "local": [
+   1.12,
+   -0.45,
+   0.35
+  ],
+  "note": "platform floor at the front edge"
+ },
+ "prompt": {
+  "x": 1422.904,
+  "y": -725.698,
+  "z": 66.17,
+  "heading": 302.5,
+  "local": [
+   0.0,
+   -1.3,
+   0.0
+  ],
+  "note": "lawn in front of the step"
+ },
+ "elf": {
+  "x": 1420.955,
+  "y": -725.339,
+  "z": 66.17,
+  "heading": 281.41,
+  "local": [
+   -1.35,
+   -2.75,
+   0.0
+  ],
+  "note": "lawn, front-left, facing the throne"
+ },
+ "photo_target": {
+  "x": 1424.633,
+  "y": -724.597,
+  "z": 67.47,
+  "heading": 122.5,
+  "local": [
+   0.0,
+   0.75,
+   1.3
+  ],
+  "note": "where the photographer aims"
+ }
+}
