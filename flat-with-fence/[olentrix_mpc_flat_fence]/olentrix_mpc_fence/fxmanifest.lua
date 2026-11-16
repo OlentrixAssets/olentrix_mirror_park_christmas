@@ -1,0 +1,21 @@
+fx_version 'cerulean'
+game 'gta5'
+lua54 'yes'
+
+name 'olentrix_mpc_fence'
+author 'Olentrix Assets'
+description 'Mirror Park Christmas: the fence and gateway round the flat court'
+version '1.2.0'
+
+this_is_a_map 'yes'
+
+data_file 'DLC_ITYP_REQUEST' 'stream/xv_gate.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/xv_pfence_n.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/xv_pfence_p00.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/xv_pfence_p01.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/xv_pfence_p02.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/xv_pfence_p03.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/xv_pfence_p04.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/xv_pfence_p05.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/xv_pfence_p06.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/xv_pfence_s.ytyp'

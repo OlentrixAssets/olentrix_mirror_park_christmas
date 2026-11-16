@@ -1,0 +1,6 @@
+Drop the [olentrix_mpc_flat] folder into your resources folder, add
+
+    ensure [olentrix_mpc_flat]
+
+to server.cfg and restart.
+Use one version of Mirror Park Christmas at a time.
