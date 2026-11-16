@@ -8,15 +8,15 @@ Welcome to Mirror Park Christmas.
 
 A Christmas village on the hill above Mirror Park: wooden market cabins, an ice rink, a Ferris wheel, a big tree, a fireside lounge, and a little steam train that does laps of the whole thing.
 
-## Download
+## Which download do I need?
 
-| Version | File |
+| You want to... | Download |
 |-|-|
-| **1.1.0** | [olentrix_mirror_park_christmas_v1.1.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.1.0/olentrix_mirror_park_christmas_v1.1.0.zip) |
-| **Props pack 1.1.0** | [olentrix_mirror_park_christmas_props_v1.1.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.1.0/olentrix_mirror_park_christmas_props_v1.1.0.zip) |
-| 1.0.0 | [olentrix_mirror_park_christmas_v1.0.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.0.0/olentrix_mirror_park_christmas_v1.0.0.zip) |
+| **Put the map on your server** (drag and drop) | [olentrix_mirror_park_christmas_server_v1.2.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.2.0/olentrix_mirror_park_christmas_server_v1.2.0.zip) |
+| **Change it or use parts of it** (developers) | [olentrix_mirror_park_christmas_developer_v1.2.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.2.0/olentrix_mirror_park_christmas_developer_v1.2.0.zip) |
+| **Use only the props in your own build** | [olentrix_mirror_park_christmas_props_v1.2.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.2.0/olentrix_mirror_park_christmas_props_v1.2.0.zip) |
 
-Or hit **Code → Download ZIP**.
+Older versions are on the [releases page](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases).
 
 **Questions, bugs, screenshots?** Come say hi on [Discord](https://discord.gg/FTZTtQRsfR).
 
@@ -25,15 +25,19 @@ Or hit **Code → Download ZIP**.
 
 - 15 wooden market cabins, each with its own stall and stock
 - Ice rink with a viewing terrace and skate hire
+- Buy ice skates and skate on the rink, with momentum, carving, hockey stops and the odd fall
+- An ice show: start it from the viewing terrace and a pair of skaters performs a three-minute routine with music and spotlights
 - Ferris wheel, main Christmas tree and a fireside lounge
 - Toy workshop with a miniature of the whole village in the window
 - The Christmas Express: a small steam train you can ride round the whole market
 - A snow globe at the end of a lantern-lit tunnel through the hill, with a snowy village inside
-- Santa's Sleigh Run: a roller coaster from the snow globe out over the hill and back
+- Santa's Sleigh Run: a roller coaster from the snow globe out over the hill, through two loops and back
 - Santa's grotto: sit on Santa's lap or stand beside him, pick a pose, and an elf counts you down for the photo. An on-screen guide walks you through the visit, with a queue when Santa is busy
+- A wandering elf who asks if you've been naughty or nice. Nice gets you a candy cane; naughty gets you a trip to Grumbold the Yule Yeti's cave
 - Carol singers by the big tree, and a Letters to Santa postbox players can write to
 - Sit on every bench, sofa and chair in the market, and ride the Ferris wheel's gondolas
 - No ambient pedestrians or traffic wandering through the market
+- Fireflies over the green spots at night
 - A tree farm, glowing reindeer, a snowman family and a skate-change deck
 - Cabin and workshop doors that open like any other door in the game
 - The railway bridge sign reads TWINKLE TOWN and lights up letter by letter
@@ -45,29 +49,40 @@ Or hit **Code → Download ZIP**.
 </details>
 
 <details>
-<summary><b>Installation</b></summary>
+<summary><b>Installation (server download)</b></summary>
 
-Drop the `[olentrix_mirror_park_christmas]` folder into your resources folder, add `ensure [olentrix_mirror_park_christmas]` to your server.cfg, and restart your server.
+1. Unzip the server download. Inside are `INSTALL.txt` and two folders.
+2. Drop `[olentrix_mirror_park_christmas]` into your resources folder and add this to your server.cfg:
 
-It comes as eight resources that work together. Keep them all:
+   ```
+   ensure [olentrix_mirror_park_christmas]
+   ```
+3. Want the extras too? Drop `[olentrix_mpc_extras]` in as well, and add a line for each one you want (see Optional extras below).
+4. Restart your server.
+
+No framework is needed. The core is twelve resources that work together, so keep them all:
 
 | Resource | What it does |
 |-|-|
 | `olentrix_mpc_mold` | The level ground the village stands on |
 | `olentrix_mpc_ground` | Clears the old court and repaves the road in |
 | `olentrix_mpc_market` | The village itself |
-| `olentrix_mpc_ambience` | Sound, the workshop train and the light ceremony |
+| `olentrix_mpc_ambience` | Sound, the workshop train, fireflies and the light ceremony |
 | `olentrix_mpc_express` | The Christmas Express |
 | `olentrix_mpc_coaster` | Santa's Sleigh Run |
 | `olentrix_mpc_santa` | Santa, the grotto photos, the carol singers and the letters |
 | `olentrix_mpc_seats` | Seats you can sit on, Ferris wheel rides, and no ambient peds or traffic in the market |
+| `olentrix_mpc_skatekit` | The skates and skating animations used by skating and the ice show |
+| `olentrix_mpc_skating` | Buying skates and skating on the rink |
+| `olentrix_mpc_iceshow` | The ice show |
+| `olentrix_mpc_elf` | The naughty or nice elf |
 
 </details>
 
 <details>
-<summary><b>Optional add-ons</b></summary>
+<summary><b>Optional extras</b></summary>
 
-Four extras sit next to the `[olentrix_mirror_park_christmas]` folder, not inside it, so they don't start unless you want them. Drop in the ones you want and add an `ensure` line for each:
+These four live in the `[olentrix_mpc_extras]` folder, so they don't start unless you add them:
 
 | Resource | What it does |
 |-|-|
@@ -88,9 +103,21 @@ The house decorations look right in sunny weather on their own. Add `olentrix_mp
 </details>
 
 <details>
+<summary><b>For developers</b></summary>
+
+The developer download has every resource as its own folder (core and extras side by side, no category folders) plus `docs/`:
+
+- `docs/README.md`: how the pieces fit together and what you can safely take out.
+- `docs/REFERENCE.md`: each resource's dependencies, settings, commands, permissions, exports, events and state keys.
+
+The same two files are in the [`developers`](developers) folder of this repository.
+
+</details>
+
+<details>
 <summary><b>Props pack</b></summary>
 
-Just want the props for your own build? The props pack is a single resource, `olentrix_mpc_props`, with 136 of the market's props and their textures, and no map or scripts, so you can place them anywhere with your map tool of choice.
+Just want the props for your own build? The props pack (third download above) is a single resource, `olentrix_mpc_props`, with 136 of the market's props and their textures, and no map or scripts, so you can place them anywhere with your map tool of choice.
 
 Drop the `olentrix_mpc_props` folder into your resources folder and add `ensure olentrix_mpc_props` to your server.cfg. Don't run it alongside the full map, which already includes every one of these.
 
@@ -262,6 +289,29 @@ Walk up to the grotto and press **E** to pick a photo spot. Once you're in place
 <summary><b>Light ceremony</b></summary>
 
 Runs on its own at 18:00, 20:00 and 22:00 game time if your server uses Renewed-Weathersync. Staff can also start it with the `xmasceremony` command (ace `command.xmasceremony`).
+
+</details>
+
+<details>
+<summary><b>Ice skating</b></summary>
+
+Buy a pair of skates at the Skate Hire counter with **E** ($50). Then sit or stand on one of the changing decks by the rink and press **G** to put them on (or take them off). On the ice: **W** pushes off, **Shift** pushes harder, **A**/**D** carve, **S** is a hockey stop. Off the ice you walk normally. Skates come off by themselves if you go far from the rink.
+
+The skates are free unless a shop resource is installed to charge for them; the price is in the config.
+
+</details>
+
+<details>
+<summary><b>Ice show</b></summary>
+
+Stand on the viewing terrace step on the north side of the rink and press **E**. After a one-minute warning the ice is cleared, and two skaters perform a three-minute routine with music and spotlights, seen by everyone at the same moment. After a show there's a ten-minute wait before the next one.
+
+</details>
+
+<details>
+<summary><b>The naughty or nice elf</b></summary>
+
+An elf wanders between spots in the market. Walk up and press **E** to talk. Answer **E** for nice and get a candy cane, or **G** for naughty and find out what Grumbold the Yule Yeti thinks of you. One visit per player per minute.
 
 </details>
 

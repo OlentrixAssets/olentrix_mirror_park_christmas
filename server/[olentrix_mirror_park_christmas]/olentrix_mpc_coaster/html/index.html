@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body>
+<script>
+const SRC = {
+  bell: 'audio/cst_bell.ogg', roll: 'audio/cst_roll.ogg', launch: 'audio/cst_launch.ogg', power: 'audio/cst_power.ogg',
+  chain: 'audio/cst_chain.ogg', wind: 'audio/cst_wind.ogg', whoosh: 'audio/cst_whoosh.ogg', brake: 'audio/cst_brake.ogg',
+  sparkle: 'audio/cst_sparkle.ogg', tunnel: 'audio/cst_tunnel.ogg', roar: 'audio/cst_roar.ogg', rattle: 'audio/cst_rattle.ogg'
+};
+const src = (k) => SRC[k] || SRC[k.replace(/^x/, '')];
+let ctx = null;
+function audioCtx() {
+  if (!ctx) { try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { ctx = null; } }
+  if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
+  return ctx;
+}
+const loops = {};
+const target = {};
+function loop(k) {
+  if (!loops[k]) {
+    const a = new Audio(src(k));
+    a.loop = true; a.volume = 0; a.preservesPitch = false;
+    const c = audioCtx(); let pan = null;
+    if (c && c.createStereoPanner) {
+      try { const s = c.createMediaElementSource(a); pan = c.createStereoPanner(); s.connect(pan); pan.connect(c.destination); } catch (e) { pan = null; }
+    }
+    a.play().catch(() => {});
+    loops[k] = { a: a, pan: pan }; target[k] = 0;
+  }
+  return loops[k];
+}
+function shot(k, v) {
+  const a = new Audio(src(k));
+  a.volume = Math.max(0, Math.min(1, v === undefined ? 1 : v));
+  a.play().catch(() => {});
+}
+setInterval(() => {
+  for (const k in loops) {
+    const a = loops[k].a;
+    const t = target[k] || 0;
+    a.volume = Math.max(0, Math.min(1, a.volume + (t - a.volume) * 0.25));
+    if (t <= 0 && a.volume < 0.01) { a.pause(); delete loops[k]; delete target[k]; }
+  }
+}, 50);
+window.addEventListener('message', (e) => {
+  const d = e.data || {};
+  if (d.a === 'shot') shot(d.k, d.v);
+  else if (d.a === 'mix') {
+    for (const k in d.l) {
+      const v = d.l[k][0], r = d.l[k][1], p = d.l[k][2];
+      if (v > 0 || loops[k]) {
+        const L = loop(k);
+        target[k] = Math.max(0, Math.min(1, v));
+        if (r) L.a.playbackRate = Math.max(0.5, Math.min(2.0, r));
+        if (L.pan && p !== undefined) L.pan.pan.value = Math.max(-1, Math.min(1, p));
+      }
+    }
+  } else if (d.a === 'stop') {
+    for (const k in target) if (k[0] !== 'x') target[k] = 0;
+  } else if (d.a === 'xstop') {
+    for (const k in target) if (k[0] === 'x') target[k] = 0;
+  }
+});
+</script>
+</body>
+</html>

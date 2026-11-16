@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>html, body { margin: 0; background: transparent; }</style>
+</head>
+<body>
+<script>
+let ac = null;
+const bufs = {}, playing = [];
+function ctx() {
+  if (!ac) ac = new AudioContext();
+  if (ac.state === 'suspended') ac.resume();
+  return ac;
+}
+function load(f) {
+  if (!bufs[f]) bufs[f] = fetch('audio/' + f).then(r => r.arrayBuffer()).then(b => ctx().decodeAudioData(b));
+  return bufs[f];
+}
+window.addEventListener('message', (e) => {
+  const d = e.data;
+  if (!d || !d.t) return;
+  if (d.t === 'play') {
+    load(d.f).then(b => {
+      const c = ctx(), s = c.createBufferSource(), g = c.createGain();
+      g.gain.value = d.v; s.buffer = b; s.connect(g).connect(c.destination); s.start();
+      const item = { s, g }; playing.push(item);
+      s.onended = () => { const i = playing.indexOf(item); if (i >= 0) playing.splice(i, 1); };
+    }).catch(() => {});
+  } else if (d.t === 'stop') {
+    const c = ctx();
+    for (const p of playing.splice(0)) {
+      p.g.gain.setTargetAtTime(0, c.currentTime, 0.15);
+      try { p.s.stop(c.currentTime + 0.6); } catch (err) {}
+    }
+  }
+});
+</script>
+</body>
+</html>

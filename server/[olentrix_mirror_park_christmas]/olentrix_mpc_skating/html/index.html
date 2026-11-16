@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body>
+<script>
+const ctx = new (window.AudioContext || window.webkitAudioContext)();
+const bufs = {};
+const names = ['glide', 'stride1', 'stride2', 'stride3', 'stop'];
+names.forEach(n => {
+    fetch('audio/' + n + '.ogg').then(r => r.arrayBuffer()).then(a => ctx.decodeAudioData(a)).then(b => { bufs[n] = b; }).catch(() => {});
+});
+const loops = {};
+function voice(gain, pan) {
+    const g = ctx.createGain(); g.gain.value = gain;
+    const p = ctx.createStereoPanner(); p.pan.value = pan;
+    g.connect(p); p.connect(ctx.destination);
+    return { g, p };
+}
+function mix(list) {
+    const seen = {};
+    const t = ctx.currentTime;
+    list.forEach(v => {
+        seen[v.id] = true;
+        let L = loops[v.id];
+        if (!L && bufs.glide) {
+            const src = ctx.createBufferSource(); src.buffer = bufs.glide; src.loop = true;
+            const vo = voice(0, v.p); src.connect(vo.g); src.start(0, Math.random() * 4);
+            L = loops[v.id] = { src, g: vo.g, p: vo.p };
+        }
+        if (L) { L.g.gain.setTargetAtTime(v.g, t, 0.08); L.p.pan.setTargetAtTime(v.p, t, 0.08); }
+    });
+    Object.keys(loops).forEach(id => {
+        if (seen[id]) return;
+        const L = loops[id]; delete loops[id];
+        L.g.gain.setTargetAtTime(0, t, 0.08);
+        setTimeout(() => { try { L.src.stop(); } catch (e) {} }, 600);
+    });
+}
+function shot(n, gain, pan) {
+    const name = n === 'stride' ? 'stride' + (1 + Math.floor(Math.random() * 3)) : n;
+    const b = bufs[name]; if (!b || gain <= 0.001) return;
+    const src = ctx.createBufferSource(); src.buffer = b; src.playbackRate.value = 0.94 + Math.random() * 0.12;
+    const vo = voice(gain, pan); src.connect(vo.g); src.start();
+}
+window.addEventListener('message', e => {
+    const m = e.data || {};
+    if (ctx.state === 'suspended') ctx.resume();
+    if (m.t === 'mix') mix(m.l || []);
+    else if (m.t === 'shot') shot(m.n, m.g || 0, m.p || 0);
+});
+</script>
+</body>
+</html>
