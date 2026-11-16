@@ -12,8 +12,9 @@ A Christmas village on the hill above Mirror Park: wooden market cabins, an ice 
 
 | Version | File |
 |-|-|
-| **1.0.0** | [olentrix_mirror_park_christmas_v1.0.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.0.0/olentrix_mirror_park_christmas_v1.0.0.zip) |
-| **Props pack 1.0.0** | [olentrix_mirror_park_christmas_props_v1.0.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.0.0/olentrix_mirror_park_christmas_props_v1.0.0.zip) |
+| **1.1.0** | [olentrix_mirror_park_christmas_v1.1.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.1.0/olentrix_mirror_park_christmas_v1.1.0.zip) |
+| **Props pack 1.1.0** | [olentrix_mirror_park_christmas_props_v1.1.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.1.0/olentrix_mirror_park_christmas_props_v1.1.0.zip) |
+| 1.0.0 | [olentrix_mirror_park_christmas_v1.0.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.0.0/olentrix_mirror_park_christmas_v1.0.0.zip) |
 
 Or hit **Code → Download ZIP**.
 
@@ -29,8 +30,10 @@ Or hit **Code → Download ZIP**.
 - The Christmas Express: a small steam train you can ride round the whole market
 - A snow globe at the end of a lantern-lit tunnel through the hill, with a snowy village inside
 - Santa's Sleigh Run: a roller coaster from the snow globe out over the hill and back
-- Santa's grotto: sit on Santa's lap or stand beside him, with an elf who counts you down for the photo
+- Santa's grotto: sit on Santa's lap or stand beside him, pick a pose, and an elf counts you down for the photo. An on-screen guide walks you through the visit, with a queue when Santa is busy
 - Carol singers by the big tree, and a Letters to Santa postbox players can write to
+- Sit on every bench, sofa and chair in the market, and ride the Ferris wheel's gondolas
+- No ambient pedestrians or traffic wandering through the market
 - A tree farm, glowing reindeer, a snowman family and a skate-change deck
 - Cabin and workshop doors that open like any other door in the game
 - The railway bridge sign reads TWINKLE TOWN and lights up letter by letter
@@ -46,7 +49,7 @@ Or hit **Code → Download ZIP**.
 
 Drop the `[olentrix_mirror_park_christmas]` folder into your resources folder, add `ensure [olentrix_mirror_park_christmas]` to your server.cfg, and restart your server.
 
-It comes as seven resources that work together. Keep them all:
+It comes as eight resources that work together. Keep them all:
 
 | Resource | What it does |
 |-|-|
@@ -57,6 +60,30 @@ It comes as seven resources that work together. Keep them all:
 | `olentrix_mpc_express` | The Christmas Express |
 | `olentrix_mpc_coaster` | Santa's Sleigh Run |
 | `olentrix_mpc_santa` | Santa, the grotto photos, the carol singers and the letters |
+| `olentrix_mpc_seats` | Seats you can sit on, Ferris wheel rides, and no ambient peds or traffic in the market |
+
+</details>
+
+<details>
+<summary><b>Optional add-ons</b></summary>
+
+Four extras sit next to the `[olentrix_mirror_park_christmas]` folder, not inside it, so they don't start unless you want them. Drop in the ones you want and add an `ensure` line for each:
+
+| Resource | What it does |
+|-|-|
+| `olentrix_mpc_houses` | Lights, wreaths, garlands and yard decorations on the houses around Mirror Park, East Vinewood, Grove Street and El Burro Heights, plus the Skid Row and port lift bridges and a few city squares |
+| `olentrix_mpc_houses_snow` | Snow drifts and snowy wreaths, garlands and swags for the house decorations. Needs `olentrix_mpc_houses` |
+| `olentrix_mpc_trees` | Christmas bulbs built into the game's own trees and palms, on every copy across the map |
+| `olentrix_mpc_streets` | Christmas decorations on street lights, traffic signals, bus shelters, post boxes, hydrants, benches, bins and more, across the map |
+
+```
+ensure olentrix_mpc_houses
+ensure olentrix_mpc_houses_snow
+ensure olentrix_mpc_trees
+ensure olentrix_mpc_streets
+```
+
+The house decorations look right in sunny weather on their own. Add `olentrix_mpc_houses_snow` only if your server runs snow.
 
 </details>
 
@@ -227,7 +254,7 @@ The sleigh waits at the station inside the snow globe. Walk up to it and press *
 <details>
 <summary><b>Santa's grotto and letters</b></summary>
 
-Walk up to the grotto to pick a photo spot. Letters posted at the Letters to Santa box are kept by the server; staff can read the latest with the `santaletters` command (ace `command.santaletters`).
+Walk up to the grotto and press **E** to pick a photo spot. Once you're in place, **E** picks a pose, **G** takes the photo, **H** whispers your wish to Santa and **Backspace** hops off. If someone else is with Santa you join the line and get told when it's your turn. Letters posted at the Letters to Santa box are kept by the server; staff can read the latest with the `santaletters` command (ace `command.santaletters`).
 
 </details>
 
@@ -240,6 +267,8 @@ Runs on its own at 18:00, 20:00 and 22:00 game time if your server uses Renewed-
 
 > [!WARNING]
 > This replaces the game's own map files for the hill court and road above Mirror Park. Other maps that change the same spot will clash with it.
+>
+> The `olentrix_mpc_trees` and `olentrix_mpc_streets` add-ons replace the game's own tree, palm and street prop models. Other resources that replace the same models will clash with them.
 
 <details>
 <summary><b>Preview</b></summary>

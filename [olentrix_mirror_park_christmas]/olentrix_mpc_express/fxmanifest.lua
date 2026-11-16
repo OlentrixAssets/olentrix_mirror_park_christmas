@@ -5,7 +5,7 @@ lua54 'yes'
 name 'olentrix_mpc_express'
 author 'Olentrix Assets'
 description 'Mirror Park Christmas: Christmas Express'
-version '1.0.0'
+version '1.1.0'
 
 dependency 'olentrix_mpc_market'
 this_is_a_map 'yes'

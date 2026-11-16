@@ -28,6 +28,7 @@ Config.Sounds = {
               playlist = { 'music.ogg', 'carol_jingle_bells.ogg', 'carol_silent_night.ogg', 'carol_we_wish_you.ogg', 'carol_deck_the_halls.ogg' } },
     bells = { file = 'bells.ogg', pos = vector3(1397.6, -740.2, 69.0), near = 5.0, far = 24.0, gain = 0.45 },
     fire  = { file = 'fire.ogg',  pos = vector3(1297.5, -757.5, 66.6), near = 2.5, far = 16.0, gain = 0.8 },
+    choir = { file = 'choir.ogg', pos = vector3(1409.0, -775.8, 67.7), near = 6.0, far = 25.0, gain = 0.6 },
 }
 
 Config.Ceremony = {

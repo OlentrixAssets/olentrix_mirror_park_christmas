@@ -32,20 +32,99 @@ Config.Santa = {
 }
 
 Config.Lap = {
-    sit = { dict = 'amb@prop_human_seat_chair@female@legs_crossed@base', clip = 'base' },
+    sit = { dict = 'amb@prop_human_seat_chair@male@generic@base', clip = 'base' },
     thighBone = 51826,
     kneeBone = 36864,
     otherThighBone = 58271,
-    along = 0.5,
-    raise = 0.1,
-    shift = 0.0,
-    turn = 20.0,
+    along = 0.85,
+    raise = -0.25,
+    shift = 0.1,
+    turn = 40.0,
 }
 
 Config.Poses = {
     { label = 'Wave', dict = 'friends@frj@ig_1', clip = 'wave_a', flag = 49 },
     { label = 'Thumbs up', dict = 'anim@mp_player_intupperthumbs_up', clip = 'idle_a', flag = 49 },
     { label = 'Arms crossed', dict = 'amb@world_human_hang_out_street@female_arms_crossed@base', clip = 'base', flag = 1 },
+}
+
+Config.LapPoses = {
+    { label = 'Wave', dict = 'anim@mp_player_intupperwave', clip = 'idle_a', flag = 49 },
+    { label = 'Thumbs up', dict = 'anim@mp_player_intupperthumbs_up', clip = 'idle_a', flag = 49 },
+    { label = 'Point at the camera', dict = 'gestures@m@standing@casual', clip = 'gesture_point', flag = 49 },
+    { label = 'Arms up, yay!', dict = 'anim@mp_player_intupperraise_the_roof', clip = 'idle_a', flag = 49 },
+    { label = 'Whisper to Santa', dict = 'anim@mp_player_intuppershush', clip = 'idle_a', flag = 49 },
+}
+
+Config.Flow = {
+    subtitleMs = 4500,
+    elfLead = 1.5,
+    gotItMs = 6000,
+    goodbyeDelay = 2.0,
+    cardSeconds = 8.0,
+    turnWindow = 20,
+    queueReach = 20.0,
+    idleSeconds = 90,
+    warnSeconds = 15,
+    chime = { name = 'CHECKPOINT_PERFECT', set = 'HUD_MINI_GAME_SOUNDSET' },
+    keys = {
+        pose = { control = 38, glyph = '~INPUT_PICKUP~' },
+        photo = { control = 47, glyph = '~INPUT_DETONATE~' },
+        wish = { control = 74, glyph = '~INPUT_VEH_HEADLIGHT~' },
+        leave = { control = 202, glyph = 'Backspace' },
+    },
+    block = { 38, 46, 51, 47, 58, 74, 177, 194, 202 },
+}
+
+Config.Text = {
+    santaName = '~r~Santa~s~',
+    elfName = '~g~Elf~s~',
+    prompt = 'Photos with Santa',
+    menuTitle = 'Photos with Santa',
+    spots = {
+        lap = { label = "Sit on Santa's lap", desc = 'The classic photo.' },
+        left = { label = 'Stand beside Santa (left)', desc = 'Strike a pose next to him.' },
+        right = { label = 'Stand beside Santa (right)', desc = 'Strike a pose next to him.' },
+    },
+    taken = ' (taken)',
+    takenDesc = 'Someone is there. Pick it to join the line.',
+    notNow = 'Maybe later',
+    posesTitle = 'Strike a pose',
+    noPose = 'Just smile',
+    panelTitle = "Santa's grotto",
+    stepPose = 'Pick a pose',
+    stepPhoto = 'Smile for the photo',
+    stepLeave = 'Hop off',
+    again = 'Another one?',
+    newPose = 'New pose',
+    allDone = 'All done',
+    wish = 'Whisper your wish to Santa',
+    done = 'Done',
+    welcome = 'Ho ho ho! Have you been good this year?',
+    elfSqueeze = 'Everybody squeeze in... say Merry Christmas!',
+    gotIt = "Got it! Take your screenshot now if you didn't (F12 on Steam).",
+    photoWait = 'One moment, the camera is still winding on!',
+    wishThanks = "I'll see what the elves can do!",
+    wishWait = 'Ho ho, one wish at a time! Ask me again in a minute.',
+    goodbye = 'Merry Christmas! Off you go now.',
+    nextVisitor = 'Time to let the next visitor up. Merry Christmas!',
+    fairUse = 'Santa needs to see the next visitor in %d s...',
+    cardTitle = "Thanks for visiting Santa's grotto!",
+    cardBody = 'Post a letter at the Letters to Santa box by the market, or catch the Christmas Express.',
+    queueNext = "Santa has a visitor. You're next in line.",
+    queuePlace = "Santa has a visitor. You're number %d in line.",
+    lineNext = "You're next in line",
+    linePlace = "You're number %d in line",
+    leaveLine = 'Leave the line',
+    yourTurn = 'Your turn!',
+    turnSeconds = ' %d s',
+    missedTurn = 'You missed your turn. Hop back in line any time!',
+    denied = 'Come a little closer to the grotto first.',
+    letterTitle = 'Dear Santa...',
+    letterPrompt = '[E] Write a letter to Santa',
+    letterPosted = 'Your letter is on its way to the North Pole.',
+    letterWait = 'Santa is still reading your last letter. Try again in a minute.',
+    lettersPrinted = 'Letters to Santa printed to your F8 console.',
 }
 
 Config.Photo = {
@@ -81,6 +160,9 @@ Config.Carollers = {
     centre = vector3(1410.0, -775.8, 66.17),
     pose = { dict = 'cellphone@', clip = 'cellphone_text_read_base' },
     book = { model = 'prop_novel_01', bone = 6286, offset = vector3(0.15, 0.03, -0.065), rotation = vector3(0.0, 180.0, 90.0) },
+    face = 'mood_talking_1',
+    chatter = { dict = 'mp_facial', clip = 'mic_chatter', every = { 1.5, 3.5 } },
+    look = { every = { 2.5, 6.0 }, ahead = 5.0, height = 1.6, playerReach = 10.0 },
     singers = {
         { model = 'a_m_m_prolhost_01', position = vector4(1409.08, -774.88, 66.17, 45.0) },
         { model = 'a_f_m_prolhost_01', position = vector4(1408.73, -775.53, 66.17, 78.0) },

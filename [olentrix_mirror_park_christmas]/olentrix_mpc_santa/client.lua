@@ -205,9 +205,59 @@ local function spawnSingers()
             singers[i] = ped
             books[i] = attachProp(ped, Config.Carollers.book)
             play(ped, Config.Carollers.pose, 1, (i - 1) / #Config.Carollers.singers)
+            SetFacialIdleAnimOverride(ped, Config.Carollers.face, 0)
         end
     end
 end
+
+local function between(range)
+    return math.floor((range[1] + math.random() * (range[2] - range[1])) * 1000)
+end
+
+local function turnHead(i, ped, hold)
+    local look, pick, me = Config.Carollers.look, math.random(), PlayerPedId()
+    local here = GetEntityCoords(ped)
+    if pick < 0.3 then
+        TaskClearLookAt(ped)
+    elseif pick < 0.45 and #(GetEntityCoords(me) - here) < look.playerReach then
+        TaskLookAtEntity(ped, me, hold, 2048, 3)
+    elseif pick < 0.65 then
+        local other = singers[i % #Config.Carollers.singers + 1] or singers[i - 1]
+        if other and DoesEntityExist(other) then TaskLookAtEntity(ped, other, hold, 2048, 3) else TaskClearLookAt(ped) end
+    else
+        local f = GetEntityForwardVector(ped)
+        local side = (math.random() - 0.5) * 4.0
+        local p = here + f * look.ahead + vector3(-f.y, f.x, 0.0) * side
+        TaskLookAtCoord(ped, p.x, p.y, Config.Carollers.centre.z + look.height, hold, 0, 2)
+    end
+end
+
+CreateThread(function()
+    local chatter, nextChatter, nextLook = Config.Carollers.chatter, {}, {}
+    while true do
+        if next(singers) then
+            loadDict(chatter.dict)
+            local now = GetGameTimer()
+            for i, ped in pairs(singers) do
+                if DoesEntityExist(ped) then
+                    if now >= (nextChatter[ped] or 0) then
+                        PlayFacialAnim(ped, chatter.clip, chatter.dict)
+                        nextChatter[ped] = now + between(chatter.every)
+                    end
+                    if now >= (nextLook[ped] or 0) then
+                        local hold = between(Config.Carollers.look.every)
+                        turnHead(i, ped, hold)
+                        nextLook[ped] = now + hold
+                    end
+                end
+            end
+            Wait(250)
+        else
+            nextChatter, nextLook = {}, {}
+            Wait(1000)
+        end
+    end
+end)
 
 local function removeSingers()
     for i = 1, #Config.Carollers.singers do
@@ -224,25 +274,57 @@ local function attachToLap(me, santa)
     local knee = GetWorldPositionOfEntityBone(santa, GetPedBoneIndex(santa, lap.kneeBone))
     local otherHip = GetWorldPositionOfEntityBone(santa, GetPedBoneIndex(santa, lap.otherThighBone))
     local side = hip - otherHip
-    local X = unit(knee - hip)
-    local Z = unit(side - X * dot(side, X))
-    local Y = cross(Z, X)
     local right = unit(vector3(side.x, side.y, 0.0))
-    local forward = cross(UP, right)
-    local turn = math.rad(lap.turn)
-    local facing = forward * math.cos(turn) - right * math.sin(turn)
-    local sitterRight = cross(facing, UP)
     local target = hip + (knee - hip) * lap.along + UP * lap.raise + right * lap.shift
-    local d = target - hip
-    local pitch = math.deg(math.asin(clamp(dot(Z, facing))))
-    local roll = math.deg(math.atan(-dot(Z, sitterRight), dot(Z, UP)))
-    local yaw = math.deg(math.atan(-dot(X, facing), dot(Y, facing)))
-    AttachEntityToEntity(me, santa, thigh, dot(d, X), dot(d, Y), dot(d, Z), pitch, roll, yaw, false, false, false, false, 2, true, 2)
+    local off = GetOffsetFromEntityGivenWorldCoords(santa, target.x, target.y, target.z)
+    AttachEntityToEntity(me, santa, 0, off.x, off.y, off.z, 0.0, 0.0, lap.turn, false, false, false, false, 2, true, 2)
 end
+
+local flow, currentPose
+local photoBusyUntil, photoAskedAt, cardUntil, turnUntil = 0, 0, 0, 0
+local lineState = GlobalState.xmasSantaLine
+
+AddStateBagChangeHandler('xmasSantaLine', 'global', function(_, _, value)
+    lineState = value
+end)
 
 local function placeAt(ped, s)
     SetEntityCoords(ped, s.x, s.y, s.z + 1.0, false, false, false, false)
     SetEntityHeading(ped, s.heading)
+end
+
+local function addText(text)
+    while #text > 99 do
+        local cut = text:sub(1, 99):match('^.*()%s') or 99
+        AddTextComponentSubstringPlayerName(text:sub(1, cut))
+        text = text:sub(cut + 1)
+    end
+    AddTextComponentSubstringPlayerName(text)
+end
+
+local function say(who, text, ms)
+    BeginTextCommandPrint('STRING')
+    addText((who == 'santa' and Config.Text.santaName or Config.Text.elfName) .. ': ' .. text)
+    EndTextCommandPrint(ms or Config.Flow.subtitleMs, true)
+end
+
+local function pressed(control)
+    return IsDisabledControlJustPressed(0, control)
+end
+
+local function backPressed()
+    return pressed(Config.Flow.keys.leave.control) and not IsDisabledControlJustPressed(0, 200) and not IsPauseMenuActive()
+end
+
+local function blockFlowControls()
+    for _, control in ipairs(Config.Flow.block) do DisableControlAction(0, control, true) end
+end
+
+local function active()
+    if flow then
+        flow.idleSince = GetGameTimer()
+        flow.warnUntil = nil
+    end
 end
 
 local function leaveSpot(stay)
@@ -250,6 +332,8 @@ local function leaveSpot(stay)
     if not spot then return end
     mySpot = nil
     menu = nil
+    flow = nil
+    currentPose = nil
     TriggerServerEvent('olentrix_mpc_santa:leave')
     local me = PlayerPedId()
     if IsEntityAttached(me) then DetachEntity(me, true, false) end
@@ -257,8 +341,6 @@ local function leaveSpot(stay)
     ClearPedTasks(me)
     if not stay then placeAt(me, exits[spot]) end
 end
-
-local openPoses
 
 local function occupy(spot)
     local santa = santaPed()
@@ -271,6 +353,9 @@ local function occupy(spot)
     FreezeEntityPosition(me, false)
     ClearPedTasksImmediately(me)
     mySpot = spot
+    menu = nil
+    currentPose = nil
+    flow = { posed = false, photos = 0, wished = false, idleSince = GetGameTimer() }
     if spot == 'lap' then
         attachToLap(me, santa)
         play(me, Config.Lap.sit, 1)
@@ -278,8 +363,8 @@ local function occupy(spot)
         placeAt(me, stands[spot])
         Wait(400)
         FreezeEntityPosition(me, true)
-        openPoses()
     end
+    say('santa', Config.Text.welcome)
 end
 
 local function holderOf(spot)
@@ -287,42 +372,98 @@ local function holderOf(spot)
     return holders and holders[spot] or false
 end
 
+local function heldFor(spot)
+    return lineState and lineState.reserved and lineState.reserved[spot] or false
+end
+
+local function myLine()
+    if not lineState then return nil end
+    local me = GetPlayerServerId(PlayerId())
+    for spot, id in pairs(lineState.reserved or {}) do
+        if id == me then return spot, 0 end
+    end
+    for spot, list in pairs(lineState.queues or {}) do
+        for i, id in ipairs(list) do
+            if id == me then return spot, i end
+        end
+    end
+end
+
 local function openMain()
     local me = GetPlayerServerId(PlayerId())
     local items = {}
-    for _, entry in ipairs({ { 'lap', "Sit on Santa's lap" }, { 'left', 'Stand left' }, { 'right', 'Stand right' } }) do
-        local holder = holderOf(entry[1])
-        local label = entry[2]
-        if holder and holder ~= me then label = label .. ' (taken)' end
-        items[#items + 1] = { label = label, spot = entry[1] }
+    for _, spot in ipairs({ 'lap', 'left', 'right' }) do
+        local words = Config.Text.spots[spot]
+        local holder, held = holderOf(spot), heldFor(spot)
+        local item = { label = words.label, desc = words.desc, spot = spot }
+        if (holder and holder ~= me) or (held and held ~= me) then
+            item.label = item.label .. Config.Text.taken
+            item.desc = Config.Text.takenDesc
+        end
+        items[#items + 1] = item
     end
-    items[#items + 1] = { label = 'Leave', leave = true }
-    menu = { title = 'Photos with Santa', items = items, index = 1 }
+    items[#items + 1] = { label = Config.Text.notNow, close = true }
+    menu = { title = Config.Text.menuTitle, items = items, index = 1 }
 end
 
-openPoses = function()
+local function posesFor(spot)
+    if spot == 'lap' then return Config.LapPoses end
+    local list, seen = {}, {}
+    for _, pose in ipairs(Config.Poses) do
+        list[#list + 1] = pose
+        seen[pose.label] = true
+    end
+    for _, pose in ipairs(Config.LapPoses) do
+        if not seen[pose.label] then list[#list + 1] = pose end
+    end
+    return list
+end
+
+local function openPoses()
     local items = {}
-    for i, pose in ipairs(Config.Poses) do items[#items + 1] = { label = pose.label, pose = i } end
-    items[#items + 1] = { label = 'Leave', leave = true }
-    menu = { title = 'Strike a pose', items = items, index = 1 }
+    for _, pose in ipairs(posesFor(mySpot)) do items[#items + 1] = { label = pose.label, pose = pose } end
+    items[#items + 1] = { label = Config.Text.noPose, clear = true }
+    items[#items + 1] = { label = Config.Text.allDone, leave = true }
+    menu = { title = Config.Text.posesTitle, items = items, index = 1 }
+end
+
+local function setPose(pose)
+    local me = PlayerPedId()
+    if currentPose then StopAnimTask(me, currentPose.dict, currentPose.clip, 2.0) end
+    currentPose = pose
+    if mySpot == 'lap' then
+        local sit = Config.Lap.sit
+        if not IsEntityPlayingAnim(me, sit.dict, sit.clip, 3) then play(me, sit, 1) end
+    end
+    if pose then play(me, pose, pose.flag) end
+    if flow then flow.posed = true end
+    active()
+end
+
+local function goodbye(nextVisitor)
+    if not flow or flow.leaving then return end
+    flow.leaving = true
+    menu = nil
+    local spot, delay = mySpot, math.floor(Config.Flow.goodbyeDelay * 1000)
+    say('santa', nextVisitor and Config.Text.nextVisitor or Config.Text.goodbye, delay + 1500)
+    SetTimeout(delay, function()
+        if mySpot ~= spot or not flow or not flow.leaving then return end
+        leaveSpot(false)
+        cardUntil = GetGameTimer() + math.floor(Config.Flow.cardSeconds * 1000)
+    end)
 end
 
 local function choose(item)
     menu = nil
+    active()
     if item.leave then
-        leaveSpot(false)
+        goodbye(false)
     elseif item.pose then
-        local pose = Config.Poses[item.pose]
-        play(PlayerPedId(), pose, pose.flag)
-    elseif item.spot == mySpot and item.spot ~= 'lap' then
-        openPoses()
+        setPose(item.pose)
+    elseif item.clear then
+        setPose(nil)
     elseif item.spot then
-        local holder = holderOf(item.spot)
-        if holder and holder ~= GetPlayerServerId(PlayerId()) then
-            notify('Someone is already there.')
-        else
-            TriggerServerEvent('olentrix_mpc_santa:take', item.spot)
-        end
+        TriggerServerEvent('olentrix_mpc_santa:take', item.spot)
     end
 end
 
@@ -333,7 +474,31 @@ local function drawText(text, x, y, scale, centre, r, g, b)
     SetTextCentre(centre)
     SetTextOutline()
     BeginTextCommandDisplayText('STRING')
-    AddTextComponentSubstringPlayerName(text)
+    addText(text)
+    EndTextCommandDisplayText(x, y)
+end
+
+local function drawRight(text, right, y, scale, r, g, b)
+    SetTextFont(4)
+    SetTextScale(scale, scale)
+    SetTextColour(r, g, b, 255)
+    SetTextJustification(2)
+    SetTextWrap(0.0, right)
+    SetTextOutline()
+    BeginTextCommandDisplayText('STRING')
+    addText(text)
+    EndTextCommandDisplayText(0.0, y)
+end
+
+local function drawWrapped(text, x, y, scale, width)
+    SetTextFont(4)
+    SetTextScale(scale, scale)
+    SetTextColour(255, 255, 255, 255)
+    SetTextCentre(true)
+    SetTextWrap(x - width / 2, x + width / 2)
+    SetTextOutline()
+    BeginTextCommandDisplayText('STRING')
+    addText(text)
     EndTextCommandDisplayText(x, y)
 end
 
@@ -343,18 +508,101 @@ local function drawText3d(text, point)
 end
 
 local function drawMenu()
-    local x, y, width, row = 0.84, 0.3, 0.2, 0.034
+    local x, y, width, row, sub = 0.84, 0.3, 0.22, 0.034, 0.024
     DrawRect(x, y, width, row * 1.2, 140, 22, 32, 235)
     drawText(menu.title, x, y - 0.017, 0.46, true, 255, 226, 150)
+    local top, left = y + row * 0.6, x - width / 2 + 0.008
     for i, item in ipairs(menu.items) do
-        local cy = y + row * 0.1 + row * i
+        local height = item.desc and row + sub or row
         local selected = i == menu.index
-        if selected then DrawRect(x, cy, width, row, 245, 240, 228, 235) else DrawRect(x, cy, width, row, 18, 40, 26, 205) end
+        if selected then DrawRect(x, top + height / 2, width, height, 245, 240, 228, 235) else DrawRect(x, top + height / 2, width, height, 18, 40, 26, 205) end
         if selected then
-            drawText(item.label, x - width / 2 + 0.008, cy - 0.014, 0.36, false, 20, 20, 20)
+            drawText(item.label, left, top + row / 2 - 0.014, 0.36, false, 20, 20, 20)
+            if item.desc then drawText(item.desc, left, top + row - 0.006, 0.28, false, 140, 22, 32) end
         else
-            drawText(item.label, x - width / 2 + 0.008, cy - 0.014, 0.36, false)
+            drawText(item.label, left, top + row / 2 - 0.014, 0.36, false)
+            if item.desc then drawText(item.desc, left, top + row - 0.006, 0.28, false, 255, 226, 150) end
         end
+        top = top + height
+    end
+end
+
+local panelStyle = {
+    current = { 245, 240, 228, 235, 20, 20, 20 },
+    todo = { 18, 40, 26, 205, 255, 255, 255 },
+    done = { 18, 40, 26, 205, 150, 175, 155 },
+    note = { 18, 40, 26, 205, 255, 226, 150 },
+    warn = { 140, 22, 32, 235, 255, 226, 150 },
+}
+
+local function drawPanel(rows)
+    local x, width, row, bottom = 0.5, 0.26, 0.032, 0.86
+    local head = row * 1.2
+    local top = bottom - head - row * #rows
+    DrawRect(x, top + head / 2, width, head, 140, 22, 32, 235)
+    drawText(Config.Text.panelTitle, x, top + head / 2 - 0.017, 0.46, true, 255, 226, 150)
+    local left, right = x - width / 2 + 0.008, x + width / 2 - 0.008
+    for i, r in ipairs(rows) do
+        local s = panelStyle[r.state]
+        local cy = top + head + row * (i - 0.5)
+        DrawRect(x, cy, width, row, s[1], s[2], s[3], s[4])
+        drawText(r.text, left, cy - 0.014, 0.36, false, s[5], s[6], s[7])
+        if r.state == 'done' then
+            drawRight(Config.Text.done, right, cy - 0.014, 0.36, 120, 200, 140)
+        elseif r.key then
+            drawRight(r.key, right, cy - 0.014, 0.36, s[5], s[6], s[7])
+        end
+    end
+end
+
+local function drawCard()
+    local x, y, width, head, body = 0.5, 0.72, 0.34, 0.04, 0.07
+    DrawRect(x, y, width, head, 140, 22, 32, 235)
+    drawText(Config.Text.cardTitle, x, y - 0.017, 0.46, true, 255, 226, 150)
+    DrawRect(x, y + head / 2 + body / 2, width, body, 18, 40, 26, 215)
+    drawWrapped(Config.Text.cardBody, x, y + head / 2 + 0.008, 0.38, width - 0.03)
+end
+
+local function visitRows(now)
+    local keys, words, rows = Config.Flow.keys, Config.Text, {}
+    if flow.warnUntil then
+        rows[#rows + 1] = { text = words.fairUse:format(math.max(0, math.ceil((flow.warnUntil - now) / 1000))), state = 'warn' }
+    end
+    if flow.photos == 0 then
+        rows[#rows + 1] = { text = '1  ' .. words.stepPose, key = keys.pose.glyph, state = flow.posed and 'done' or 'current' }
+        rows[#rows + 1] = { text = '2  ' .. words.stepPhoto, key = keys.photo.glyph, state = flow.posed and 'current' or 'todo' }
+        rows[#rows + 1] = { text = '3  ' .. words.stepLeave, key = keys.leave.glyph, state = 'todo' }
+    else
+        if flow.posed then rows[#rows + 1] = { text = '1  ' .. words.stepPose, state = 'done' } end
+        rows[#rows + 1] = { text = '2  ' .. words.stepPhoto, state = 'done' }
+        rows[#rows + 1] = { text = words.again, key = keys.photo.glyph, state = 'current' }
+        rows[#rows + 1] = { text = words.newPose, key = keys.pose.glyph, state = 'todo' }
+        rows[#rows + 1] = { text = words.allDone, key = keys.leave.glyph, state = 'todo' }
+    end
+    if not flow.wished then rows[#rows + 1] = { text = words.wish, key = keys.wish.glyph, state = 'note' } end
+    return rows
+end
+
+local function lineRows(place, now)
+    local keys, words, rows = Config.Flow.keys, Config.Text, {}
+    if place == 0 then
+        local text = words.yourTurn
+        if turnUntil > now then text = text .. words.turnSeconds:format(math.ceil((turnUntil - now) / 1000)) end
+        rows[1] = { text = text, key = keys.pose.glyph, state = 'current' }
+    else
+        rows[1] = { text = place == 1 and words.lineNext or words.linePlace:format(place), state = 'note' }
+    end
+    rows[2] = { text = words.leaveLine, key = keys.leave.glyph, state = 'todo' }
+    return rows
+end
+
+local function fairUse(now)
+    local list = lineState and lineState.queues and lineState.queues[mySpot]
+    if list and #list > 0 and now - flow.idleSince >= Config.Flow.idleSeconds * 1000 then
+        flow.warnUntil = flow.warnUntil or now + Config.Flow.warnSeconds * 1000
+        if now >= flow.warnUntil then goodbye(true) end
+    else
+        flow.warnUntil = nil
     end
 end
 
@@ -363,46 +611,101 @@ local function handleMenu()
     DisableControlAction(0, 199, true)
     DisableControlAction(0, 200, true)
     drawMenu()
-    if IsControlJustPressed(0, 172) then menu.index = menu.index > 1 and menu.index - 1 or #menu.items end
-    if IsControlJustPressed(0, 173) then menu.index = menu.index < #menu.items and menu.index + 1 or 1 end
-    if IsControlJustPressed(0, 201) then choose(menu.items[menu.index]) return end
-    if IsControlJustPressed(0, 202) then menu = nil end
-end
-
-local function handleGrotto(position)
-    if menu and not mySpot and #(position - prompt) > Config.PromptDistance + 2.0 then menu = nil end
-    if menu then
-        handleMenu()
-    elseif mySpot then
-        drawText3d(mySpot == 'lap' and '[E] Options  [G] Take photo' or '[E] Poses  [G] Take photo', prompt)
-        if IsControlJustPressed(0, 38) then
-            if mySpot == 'lap' then openMain() else openPoses() end
-        elseif IsControlJustPressed(0, 47) then
-            TriggerServerEvent('olentrix_mpc_santa:photo')
-        end
-    elseif #(position - prompt) < Config.PromptDistance then
-        drawText3d('[E] Photos with Santa', prompt)
-        if IsControlJustPressed(0, 38) then openMain() end
+    if pressed(172) then
+        menu.index = menu.index > 1 and menu.index - 1 or #menu.items
+        active()
+    end
+    if pressed(173) then
+        menu.index = menu.index < #menu.items and menu.index + 1 or 1
+        active()
+    end
+    if pressed(201) then choose(menu.items[menu.index]) return end
+    if pressed(202) then
+        menu = nil
+        active()
     end
 end
 
-local function writeLetter()
-    AddTextEntry('OLENTRIX_MPC_LETTER', 'Dear Santa...')
+local function askLetter()
+    AddTextEntry('OLENTRIX_MPC_LETTER', Config.Text.letterTitle)
     DisplayOnscreenKeyboard(1, 'OLENTRIX_MPC_LETTER', '', '', '', '', '', Config.Letters.maxLength)
     while UpdateOnscreenKeyboard() == 0 do
         DisableAllControlActions(0)
         Wait(0)
     end
-    if UpdateOnscreenKeyboard() ~= 1 then return end
+    if UpdateOnscreenKeyboard() ~= 1 then return nil end
     local text = GetOnscreenKeyboardResult()
-    if text and text:match('%S') then TriggerServerEvent('olentrix_mpc_santa:letter', text) end
+    if text and text:match('%S') then return text end
+end
+
+local function makeWish()
+    local text = askLetter()
+    if text and mySpot then TriggerServerEvent('olentrix_mpc_santa:wish', text) end
+    active()
+end
+
+local function handleVisit(now)
+    blockFlowControls()
+    if not flow or flow.leaving or now < photoBusyUntil then return end
+    fairUse(now)
+    if flow.leaving then return end
+    drawPanel(visitRows(now))
+    if menu then
+        handleMenu()
+        return
+    end
+    local keys = Config.Flow.keys
+    if pressed(keys.pose.control) then
+        active()
+        openPoses()
+    elseif pressed(keys.photo.control) then
+        active()
+        if now - photoAskedAt > 1500 then
+            photoAskedAt = now
+            TriggerServerEvent('olentrix_mpc_santa:photo')
+        end
+    elseif pressed(keys.wish.control) and not flow.wished then
+        makeWish()
+    elseif backPressed() then
+        goodbye(false)
+    end
+end
+
+local function handleGrotto(position, now)
+    if menu and not mySpot and #(position - prompt) > Config.PromptDistance + 2.0 then menu = nil end
+    if mySpot then
+        handleVisit(now)
+        return
+    end
+    if menu then
+        handleMenu()
+        return
+    end
+    local spot, place = myLine()
+    if spot then
+        drawPanel(lineRows(place, now))
+        if place == 0 and pressed(Config.Flow.keys.pose.control) then
+            TriggerServerEvent('olentrix_mpc_santa:take', spot)
+            return
+        end
+        if backPressed() then TriggerServerEvent('olentrix_mpc_santa:unqueue') end
+    end
+    if #(position - prompt) < Config.PromptDistance then
+        drawText3d(Config.Text.prompt .. '  ' .. Config.Flow.keys.pose.glyph, prompt)
+        if pressed(Config.Flow.keys.pose.control) then openMain() end
+    end
+end
+
+local function writeLetter()
+    local text = askLetter()
+    if text then TriggerServerEvent('olentrix_mpc_santa:letter', text) end
 end
 
 local function handleLetters(position)
     local box = Config.Letters.position
     local point = vector3(box.x, box.y, box.z + 1.0)
     if #(position - point) < Config.Letters.promptDistance then
-        drawText3d('[E] Write a letter to Santa', point)
+        drawText3d(Config.Text.letterPrompt, point)
         if IsControlJustPressed(0, 38) then writeLetter() end
     end
 end
@@ -449,8 +752,10 @@ CreateThread(function()
         local position = GetEntityCoords(PlayerPedId())
         if #(position - grotto) < 25.0 then
             wait = 0
+            local now = GetGameTimer()
             drawFlash()
-            if santaPed() then handleGrotto(position) elseif menu then menu = nil end
+            if now < cardUntil then drawCard() end
+            if santaPed() then handleGrotto(position, now) elseif menu then menu = nil end
         end
         if #(position - Config.Letters.position) < 10.0 then
             wait = 0
@@ -465,16 +770,40 @@ RegisterNetEvent('olentrix_mpc_santa:granted', function(spot)
 end)
 
 RegisterNetEvent('olentrix_mpc_santa:denied', function()
-    notify('Someone is already there.')
+    notify(Config.Text.denied)
+end)
+
+RegisterNetEvent('olentrix_mpc_santa:queued', function(_, place)
+    say('elf', place == 1 and Config.Text.queueNext or Config.Text.queuePlace:format(place))
+end)
+
+RegisterNetEvent('olentrix_mpc_santa:turn', function(_, seconds)
+    turnUntil = GetGameTimer() + (seconds or Config.Flow.turnWindow) * 1000
+    PlaySoundFrontend(-1, Config.Flow.chime.name, Config.Flow.chime.set, true)
+    say('elf', Config.Text.yourTurn .. ' ' .. Config.Flow.keys.pose.glyph)
+end)
+
+RegisterNetEvent('olentrix_mpc_santa:missed', function()
+    say('elf', Config.Text.missedTurn)
+end)
+
+RegisterNetEvent('olentrix_mpc_santa:photoWait', function()
+    say('elf', Config.Text.photoWait)
+end)
+
+RegisterNetEvent('olentrix_mpc_santa:wished', function(ok)
+    if ok and flow then flow.wished = true end
+    say('santa', ok and Config.Text.wishThanks or Config.Text.wishWait)
 end)
 
 RegisterNetEvent('olentrix_mpc_santa:photo', function(posed)
     local me = GetPlayerServerId(PlayerId())
-    shutterAt = GetGameTimer() + Config.Photo.countdown * 1000
+    local lead = math.floor((Config.Flow.elfLead + Config.Photo.countdown) * 1000)
+    shutterAt = GetGameTimer() + lead
     if elf then
         local dict = 'amb@world_human_paparazzi@male@idle_a'
         if loadDict(dict) then TaskPlayAnim(elf, dict, 'idle_a', 4.0, -4.0, -1, 0, 0.0, false, false, false) end
-        SetTimeout(Config.Photo.countdown * 1000 + 2500, function()
+        SetTimeout(lead + 2500, function()
             if elf then play(elf, Config.Elf.pose, 1) end
         end)
     end
@@ -483,23 +812,29 @@ RegisterNetEvent('olentrix_mpc_santa:photo', function(posed)
         if id == me then mine = true end
     end
     if not mine then return end
+    local shot = shutterAt
+    local stop = shot + math.floor(Config.Photo.hideSeconds * 1000)
+    photoBusyUntil = stop
+    menu = nil
+    say('elf', Config.Text.elfSqueeze, lead)
     CreateThread(function()
-        local shot = shutterAt
-        local stop = shot + math.floor(Config.Photo.hideSeconds * 1000)
         local counted, snapped
         while GetGameTimer() < stop do
             local now = GetGameTimer()
-            HideHudAndRadarThisFrame()
             if now < shot then
-                local n = math.ceil((shot - now) / 1000)
-                if n ~= counted then
-                    counted = n
-                    PlaySoundFrontend(-1, '3_2_1', 'HUD_MINI_GAME_SOUNDSET', true)
+                if shot - now <= Config.Photo.countdown * 1000 then
+                    local n = math.ceil((shot - now) / 1000)
+                    if n ~= counted then
+                        counted = n
+                        PlaySoundFrontend(-1, '3_2_1', 'HUD_MINI_GAME_SOUNDSET', true)
+                    end
+                    drawText(tostring(n), 0.5, 0.36, 2.2, true, 255, 230, 160)
                 end
-                drawText(tostring(n), 0.5, 0.36, 2.2, true, 255, 230, 160)
             else
+                HideHudAndRadarThisFrame()
                 if not snapped then
                     snapped = true
+                    ClearPrints()
                     PlaySoundFrontend(-1, 'Camera_Shoot', 'Phone_Soundset_Franklin', true)
                 end
                 local alpha = 1.0 - (now - shot) / 450
@@ -507,16 +842,21 @@ RegisterNetEvent('olentrix_mpc_santa:photo', function(posed)
             end
             Wait(0)
         end
+        if flow and mySpot then
+            flow.photos = flow.photos + 1
+            active()
+            say('elf', Config.Text.gotIt, Config.Flow.gotItMs)
+        end
     end)
 end)
 
 RegisterNetEvent('olentrix_mpc_santa:posted', function(ok)
-    if ok then notify('Your letter is on its way to the North Pole.') else notify('Santa is still reading your last letter. Try again in a minute.') end
+    if ok then notify(Config.Text.letterPosted) else notify(Config.Text.letterWait) end
 end)
 
 RegisterNetEvent('olentrix_mpc_santa:letters', function(lines)
     for _, line in ipairs(lines) do print(line) end
-    notify('Letters to Santa printed to your F8 console.')
+    notify(Config.Text.lettersPrinted)
 end)
 
 AddEventHandler('onResourceStop', function(name)

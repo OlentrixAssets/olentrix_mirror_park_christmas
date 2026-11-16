@@ -1,7 +1,8 @@
 local CER = Config.Ceremony
 local passK = 0.0
 local kP, kG = 0.0, 0.0
-local zoneFiles, mixKeys = {}, { 'music', 'bells', 'fire', 'cer' }
+local zoneFiles, mixKeys = {}, { 'cer' }
+for k, s in pairs(Config.Sounds) do zoneFiles[k] = s.file; mixKeys[#mixKeys + 1] = k end
 for k, s in pairs(Config.ZoneSounds or {}) do zoneFiles[k] = s.file; mixKeys[#mixKeys + 1] = k end
 table.sort(mixKeys)
 
@@ -123,7 +124,7 @@ CreateThread(function()
         local mix = {}
         for k, s in pairs(Config.Sounds) do
             local g, d = gainAt(cam, s.pos, s.near, s.far)
-            mix[k] = { g * s.gain * ((k == 'music' or k == 'bells') and duck or 1.0) * (1.0 - passK), g > 0 and panAt(cam, s.pos, d) or 0.0 }
+            mix[k] = { g * s.gain * ((k == 'music' or k == 'bells' or k == 'choir') and duck or 1.0) * (1.0 - passK), g > 0 and panAt(cam, s.pos, d) or 0.0 }
         end
         local cg = 0.0
         if el then cg = gainAt(cam, Config.SiteCentre, CER.Sound.near, CER.Sound.far) * CER.Sound.gain * (1.0 - passK) end
