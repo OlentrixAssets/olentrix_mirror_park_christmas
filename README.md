@@ -1,30 +1,144 @@
 # [FREE] [MAP] Mirror Park Christmas
 
+Welcome to Mirror Park Christmas.
+
+A Christmas village on the hill above Mirror Park: market cabins, an ice rink, a Ferris wheel, a steam train, a snow globe hidden in the hill, a sleigh coaster to get you back out, and Santa himself.
+
 > [!CAUTION]
 > **STILL BEING WORKED ON.** This map is a work in progress and things will keep changing.
 > If you're going to complain that it isn't ready, don't use it yet.
 
-A Christmas village on the hill above Mirror Park: market cabins, an ice rink, a Ferris wheel, a steam train, a snow globe with a roller coaster, Santa's grotto and more.
+## Download
 
-## Downloads
-
-Pick one version. Every one is drag and drop.
-
-| Version | What you get | Download |
+| Version | File | What's inside |
 |-|-|-|
-| **Furnished** | Everything, as shown | [furnished](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.2.0/olentrix_mirror_park_christmas_furnished_v1.2.0.zip) |
-| **Unfurnished** | The buildings, paths, fence, rink, wheel and snow globe, empty for you to furnish | [unfurnished](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.2.0/olentrix_mirror_park_christmas_unfurnished_v1.2.0.zip) |
-| **Flat with fence** | The levelled hill with the fence round it | [flat with fence](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.2.0/olentrix_mirror_park_christmas_flat_with_fence_v1.2.0.zip) |
-| **Flat** | Just the levelled hill | [flat](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.2.0/olentrix_mirror_park_christmas_flat_v1.2.0.zip) |
-| **Props** | The market's props on their own, to place anywhere | [props](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.2.0/olentrix_mirror_park_christmas_props_v1.2.0.zip) |
+| **Furnished** | [olentrix_mirror_park_christmas_furnished_v1.2.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.2.0/olentrix_mirror_park_christmas_furnished_v1.2.0.zip) | Everything, as shown, plus the city-wide extras |
+| **Unfurnished** | [olentrix_mirror_park_christmas_unfurnished_v1.2.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.2.0/olentrix_mirror_park_christmas_unfurnished_v1.2.0.zip) | The buildings, paths, fence, rink, wheel and snow globe, empty for you to furnish |
+| **Flat with fence** | [olentrix_mirror_park_christmas_flat_with_fence_v1.2.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.2.0/olentrix_mirror_park_christmas_flat_with_fence_v1.2.0.zip) | The levelled hill with the fence round it |
+| **Flat** | [olentrix_mirror_park_christmas_flat_v1.2.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.2.0/olentrix_mirror_park_christmas_flat_v1.2.0.zip) | Just the levelled hill |
+| **Props** | [olentrix_mirror_park_christmas_props_v1.2.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.2.0/olentrix_mirror_park_christmas_props_v1.2.0.zip) | The market's props on their own, to place anywhere |
 
-## Install
+Or hit **Code → Download ZIP** to grab all four map versions, each in its own folder.
 
-Drop the folder inside the zip into your resources folder, add the `ensure` line from `INSTALL.txt` to your server.cfg, and restart.
+> [!WARNING]
+> Only run one version, they're the same hill and will fight.
 
-The furnished version also has an `[olentrix_mpc_extras]` folder: Christmas decorations on houses, trees and streets around the city. Add `ensure` lines for the ones you want (snow is optional, for snowy servers).
 
 **Questions, bugs, screenshots?** Come say hi on [Discord](https://discord.gg/FTZTtQRsfR).
 
-> [!WARNING]
-> This replaces the game's own map files for the hill court above Mirror Park, so other maps that change the same spot will clash with it.
+<details>
+<summary><b>Features</b></summary>
+
+- 15 wooden market cabins, each with its own stall and stock
+- Ice rink with a viewing terrace, a skate hire and changing decks, and you can actually skate on it
+- An ice show: two skaters put on a full routine to music
+- Ferris wheel you can ride, a main Christmas tree and a fireside lounge
+- The Christmas Express: a small steam train you can ride round the whole market
+- A snow globe at the end of a lantern-lit tunnel through the hill, with a snowy village inside
+- Santa's Sleigh Run: a roller coaster from the snow globe out over the hill and back
+- Santa's grotto: sit on Santa's lap or stand beside him, pick a pose, and an elf counts you down for the photo
+- A wandering elf who wants to know if you've been naughty or nice. Choose carefully
+- Carol singers by the big tree, and a Letters to Santa postbox
+- Sit on every bench, sofa and chair in the market
+- Music, carols, bells and a crackling fire near the attractions
+- An evening light ceremony that lights the village up landmark by landmark
+- No random NPCs or traffic wandering through the market
+- No framework, no database
+
+```
+/tp 1372.00, -735.00, 66.60
+```
+
+</details>
+
+<details>
+<summary><b>Installation</b></summary>
+
+It's literally like every other FiveM map resource. Drop the `[olentrix_mirror_park_christmas]` folder into your resources folder, add `ensure [olentrix_mirror_park_christmas]` to your server.cfg, and restart your server.
+
+Congratulations, you now own Christmas.
+
+</details>
+
+<details>
+<summary><b>Optional extras</b></summary>
+
+The furnished version also comes with an `[olentrix_mpc_extras]` folder. Copy it in too and add a line for each one you want:
+
+```
+ensure olentrix_mpc_houses
+ensure olentrix_mpc_houses_snow
+ensure olentrix_mpc_trees
+ensure olentrix_mpc_streets
+```
+
+- **olentrix_mpc_houses:** lights, wreaths, garlands and yard decorations on houses around the city, plus a few bridges and squares
+- **olentrix_mpc_houses_snow:** snow for those decorations, only if your server runs snow
+- **olentrix_mpc_trees:** Christmas bulbs in the game's own trees and palms, map-wide
+- **olentrix_mpc_streets:** decorations on street lights, signals, bus shelters, benches and more, map-wide
+
+</details>
+
+<details>
+<summary><b>How it works</b></summary>
+
+- **Christmas Express:** walk up to a coach at the station and press **E** to board, **E** again to step off.
+- **Santa's Sleigh Run:** the sleigh waits inside the snow globe. Press **E** to ride, one rider at a time.
+- **Ferris wheel:** board on the platform and press **E**. One full turn, **Backspace** to get off at the bottom.
+- **Ice skating:** grab skates at the Skate Hire counter with **E**, then press **G** on a changing deck to put them on or take them off.
+- **Ice show:** press **E** at the terrace to start it. The ice clears a minute before.
+- **The elf:** press **E** to talk, then **E** for nice or **G** for naughty.
+- **Santa's grotto:** press **E** to pick a photo spot, **E** for a pose, **G** for the photo, **H** to whisper your wish and **Backspace** to hop off.
+- **Letters to Santa:** letters are kept on the server. Staff read the latest with the `santaletters` command (ace `command.santaletters`).
+- **Light ceremony:** runs on its own at 18:00, 20:00 and 22:00 game time if your server uses Renewed-Weathersync. Staff can also start it with the `xmasceremony` command (ace `command.xmasceremony`).
+
+</details>
+
+<details>
+<summary><b>Props</b></summary>
+
+Just want the props for your own build? The props zip is a single resource, `olentrix_mpc_props`, with the market's props and their textures and no map or scripts. Don't run it alongside the full map, which already has every one of them.
+
+</details>
+
+<details>
+<summary><b>Textures</b></summary>
+
+All textures are conveniently packed into YTD files, making them easy to modify, customize, or completely ruin with your own questionable decisions.
+
+</details>
+
+<details>
+<summary><b>Heads up</b></summary>
+
+This map replaces the hill court and road above Mirror Park. If you're running another map in that same spot, they're going to fight, and nobody wins.
+The trees and streets extras replace the game's own tree, palm and street prop models, so anything else that replaces those will fight with them too.
+
+```
+/tp 1372.00, -735.00, 66.60
+```
+
+</details>
+
+<details>
+<summary><b>License</b></summary>
+
+Free to use and edit on your own server. No resale, re-uploading, or sharing.
+
+</details>
+
+Remember, don't lick the frozen lamp posts, stay off the ice during the show, and for the love of everything holy, stop asking why your map isn't working when you forgot to ensure the resource.
+
+Good day, you magnificent deviants.
+
+---
+
+| | |
+|-|-|
+| Code is accessible | Yes |
+| Subscription-based | No |
+| Lines (approximately) | 6,200 |
+| Requirements | None, standalone |
+| Support | Yes |
+
+**Made with:** Blender 5.2.3 · Sollumz 2.9.0 · CodeWalker (Latest Release) · DirectXTex texconv 2026.5.8.1 · OpenIV 4.1
