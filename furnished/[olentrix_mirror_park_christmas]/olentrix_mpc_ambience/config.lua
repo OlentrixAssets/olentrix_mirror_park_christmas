@@ -12,7 +12,6 @@ Config.Train = {
 }
 
 Config.Effects = {
-    { name = 'steam', asset = 'core', fx = 'ent_amb_cluckb_steam', pos = vector3(1389.64, -720.68, 67.64), scale = 0.55, range = 60.0 },
     { name = 'fire', asset = 'core', fx = 'ent_amb_beach_campfire', pos = vector3(1297.32, -757.76, 66.47), scale = 1.1, range = 70.0,
       light = { offset = vector3(0.18, 0.26, 0.55), colour = { 255, 140, 60 }, range = 7.0, intensity = 2.6 } },
     { name = 'firebase', asset = 'core', fx = 'ent_amb_barrel_fire', pos = vector3(1297.5, -757.5, 66.45), scale = 1.0, range = 50.0 },

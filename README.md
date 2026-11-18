@@ -12,11 +12,11 @@ A Christmas village on the hill above Mirror Park: market cabins, an ice rink, a
 
 | Version | File | What's inside |
 |-|-|-|
-| **Furnished** | [olentrix_mirror_park_christmas_furnished_v1.2.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.2.0/olentrix_mirror_park_christmas_furnished_v1.2.0.zip) | Everything, as shown, plus the city-wide extras |
-| **Unfurnished** | [olentrix_mirror_park_christmas_unfurnished_v1.2.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.2.0/olentrix_mirror_park_christmas_unfurnished_v1.2.0.zip) | The buildings, paths, fence, rink, wheel and snow globe, empty for you to furnish |
-| **Flat with fence** | [olentrix_mirror_park_christmas_flat_with_fence_v1.2.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.2.0/olentrix_mirror_park_christmas_flat_with_fence_v1.2.0.zip) | The levelled hill with the fence round it |
-| **Flat** | [olentrix_mirror_park_christmas_flat_v1.2.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.2.0/olentrix_mirror_park_christmas_flat_v1.2.0.zip) | Just the levelled hill |
-| **Props** | [olentrix_mirror_park_christmas_props_v1.2.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.2.0/olentrix_mirror_park_christmas_props_v1.2.0.zip) | The market's props on their own, to place anywhere |
+| **Furnished** | [olentrix_mirror_park_christmas_furnished_v1.3.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.3.0/olentrix_mirror_park_christmas_furnished_v1.3.0.zip) | Everything, as shown, plus the city-wide extras |
+| **Unfurnished** | [olentrix_mirror_park_christmas_unfurnished_v1.3.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.3.0/olentrix_mirror_park_christmas_unfurnished_v1.3.0.zip) | The buildings, paths, fence, rink, wheel and snow globe, empty for you to furnish |
+| **Flat with fence** | [olentrix_mirror_park_christmas_flat_with_fence_v1.3.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.3.0/olentrix_mirror_park_christmas_flat_with_fence_v1.3.0.zip) | The levelled hill with the fence round it |
+| **Flat** | [olentrix_mirror_park_christmas_flat_v1.3.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.3.0/olentrix_mirror_park_christmas_flat_v1.3.0.zip) | Just the levelled hill |
+| **Props** | [olentrix_mirror_park_christmas_props_v1.3.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.3.0/olentrix_mirror_park_christmas_props_v1.3.0.zip) | The market's props on their own, to place anywhere |
 
 Or hit **Code → Download ZIP** to grab all four map versions, each in its own folder.
 
