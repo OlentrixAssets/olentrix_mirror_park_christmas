@@ -5,7 +5,7 @@ lua54 'yes'
 name 'olentrix_mpc_houses_snow'
 author 'Olentrix Assets'
 description 'Mirror Park Christmas: snow on the house dressing, for snowy servers (optional add-on, needs olentrix_mpc_houses)'
-version '1.3.0'
+version '1.4.0'
 
 this_is_a_map 'yes'
 

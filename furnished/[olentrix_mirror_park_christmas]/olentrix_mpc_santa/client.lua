@@ -733,8 +733,11 @@ local function writeLetter()
     if text then TriggerServerEvent('olentrix_mpc_santa:letter', text) end
 end
 
-local function handleLetters(position)
-    local box = Config.Letters.position
+local letterSpots = {}
+if Config.Letters.position then letterSpots[#letterSpots + 1] = Config.Letters.position end
+for _, spot in ipairs(Config.Letters.spots or {}) do letterSpots[#letterSpots + 1] = spot end
+
+local function handleLetters(position, box)
     local point = vector3(box.x, box.y, box.z + 1.0)
     if #(position - point) < Config.Letters.promptDistance then
         drawText3d(Config.Text.letterPrompt, point)
@@ -789,9 +792,11 @@ CreateThread(function()
             if now < cardUntil then drawCard() end
             if santaPed() then handleGrotto(position, now) elseif menu then menu = nil end
         end
-        if #(position - Config.Letters.position) < 10.0 then
-            wait = 0
-            handleLetters(position)
+        for _, box in ipairs(letterSpots) do
+            if #(position - box) < 10.0 then
+                wait = 0
+                handleLetters(position, box)
+            end
         end
         Wait(wait)
     end

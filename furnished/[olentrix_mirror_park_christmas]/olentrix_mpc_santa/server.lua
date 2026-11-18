@@ -23,6 +23,17 @@ local function near(src, point, range)
     return p ~= nil and #(p - point) <= range
 end
 
+local letterSpots = {}
+if Config.Letters.position then letterSpots[#letterSpots + 1] = Config.Letters.position end
+for _, spot in ipairs(Config.Letters.spots or {}) do letterSpots[#letterSpots + 1] = spot end
+
+local function nearLetters(src)
+    for _, spot in ipairs(letterSpots) do
+        if near(src, spot, Config.Letters.reach) then return true end
+    end
+    return false
+end
+
 local function anyoneWithin(range)
     for _, id in ipairs(GetPlayers()) do
         if near(id, grotto, range) then return true end
@@ -262,7 +273,7 @@ end
 
 RegisterNetEvent('olentrix_mpc_santa:letter', function(text)
     local src = source
-    if not near(src, Config.Letters.position, Config.Letters.reach) then return end
+    if not nearLetters(src) then return end
     local ok = fileLetter(src, text)
     if ok ~= nil then TriggerClientEvent('olentrix_mpc_santa:posted', src, ok) end
 end)
