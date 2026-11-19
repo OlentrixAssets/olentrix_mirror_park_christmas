@@ -2,7 +2,7 @@
 
 Welcome to Mirror Park Christmas.
 
-A Christmas village on the hill above Mirror Park: market cabins, an ice rink, a Ferris wheel, a steam train, a snow globe hidden in the hill, a sleigh coaster to get you back out, and Santa himself.
+A Christmas village on the hill above Mirror Park: market cabins, an ice rink, a Ferris wheel, a steam train, a snow globe hidden in the hill, a sleigh coaster to get you back out, and Santa himself. Downtown, Legion Square gets the same treatment, with a coaster underneath it.
 
 > [!CAUTION]
 > **STILL BEING WORKED ON.** This map is a work in progress and things will keep changing.
@@ -12,11 +12,11 @@ A Christmas village on the hill above Mirror Park: market cabins, an ice rink, a
 
 | Version | File | What's inside |
 |-|-|-|
-| **Furnished** | [olentrix_mirror_park_christmas_furnished_v1.5.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.5.0/olentrix_mirror_park_christmas_furnished_v1.5.0.zip) | Everything, as shown, plus the city-wide extras |
-| **Unfurnished** | [olentrix_mirror_park_christmas_unfurnished_v1.5.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.5.0/olentrix_mirror_park_christmas_unfurnished_v1.5.0.zip) | The buildings, paths, fence, rink, wheel and snow globe, empty for you to furnish |
-| **Flat with fence** | [olentrix_mirror_park_christmas_flat_with_fence_v1.5.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.5.0/olentrix_mirror_park_christmas_flat_with_fence_v1.5.0.zip) | The levelled hill with the fence round it |
-| **Flat** | [olentrix_mirror_park_christmas_flat_v1.5.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.5.0/olentrix_mirror_park_christmas_flat_v1.5.0.zip) | Just the levelled hill |
-| **Props** | [olentrix_mirror_park_christmas_props_v1.5.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v1.5.0/olentrix_mirror_park_christmas_props_v1.5.0.zip) | The market's props on their own, to place anywhere |
+| **Furnished** | [olentrix_mirror_park_christmas_furnished_v2.0.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v2.0.0/olentrix_mirror_park_christmas_furnished_v2.0.0.zip) | Everything, as shown, plus Legion Square and the city-wide extras |
+| **Unfurnished** | [olentrix_mirror_park_christmas_unfurnished_v2.0.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v2.0.0/olentrix_mirror_park_christmas_unfurnished_v2.0.0.zip) | The buildings, paths, fence, rink, wheel and snow globe, empty for you to furnish |
+| **Flat with fence** | [olentrix_mirror_park_christmas_flat_with_fence_v2.0.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v2.0.0/olentrix_mirror_park_christmas_flat_with_fence_v2.0.0.zip) | The levelled hill with the fence round it |
+| **Flat** | [olentrix_mirror_park_christmas_flat_v2.0.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v2.0.0/olentrix_mirror_park_christmas_flat_v2.0.0.zip) | Just the levelled hill |
+| **Props** | [olentrix_mirror_park_christmas_props_v2.0.0.zip](https://github.com/OlentrixAssets/olentrix_mirror_park_christmas/releases/download/v2.0.0/olentrix_mirror_park_christmas_props_v2.0.0.zip) | The market's props on their own, to place anywhere |
 
 Or hit **Code → Download ZIP** to grab all four map versions, each in its own folder.
 
@@ -43,10 +43,16 @@ Or hit **Code → Download ZIP** to grab all four map versions, each in its own 
 - Music, carols, bells and a crackling fire near the attractions
 - An evening light ceremony that lights the village up landmark by landmark
 - No random NPCs or traffic wandering through the market
+- Legion Square downtown as a Christmas plaza: cabins, an ice rink, tree islands, seats to sit on and carols across the square
+- Neon lights in the plaza that pulse on the beat of the music
+- The Legion Plunge: a coaster that dives under the square and comes back out
+- A snowball corner, and a grate in the pavement you might not want to open
+- `xmasintro`: a camera tour of the market and the square, timed to a song
 - No framework, no database
 
 ```
 /tp 1372.00, -735.00, 66.60
+/tp 196.24, -933.36, 29.20
 ```
 
 </details>
@@ -57,6 +63,8 @@ Or hit **Code → Download ZIP** to grab all four map versions, each in its own 
 It's literally like every other FiveM map resource. Drop the `[olentrix_mirror_park_christmas]` folder into your resources folder, add `ensure [olentrix_mirror_park_christmas]` to your server.cfg, and restart your server.
 
 Congratulations, you now own Christmas.
+
+Legion Square is its own folder in the furnished version, `[olentrix_mpc_legion]`. Copy it in as well and add `ensure [olentrix_mpc_legion]`. It needs `olentrix_mpc_houses` from the extras folder.
 
 </details>
 
@@ -90,6 +98,10 @@ ensure olentrix_mpc_streets
 - **The elf:** press **E** to talk, then **E** for nice or **G** for naughty.
 - **Santa's grotto:** press **E** to pick a photo spot, **E** for a pose, **G** for the photo, **H** to whisper your wish and **Backspace** to hop off.
 - **Letters to Santa:** letters are kept on the server. Staff read the latest with the `santaletters` command (ace `command.santaletters`).
+- **The Legion Plunge:** walk into the entrance canopy in the north-west corner of the square and press **E**.
+- **Snowballs:** press **E** at the snowball corner in the south-west of the square.
+- **The grate:** press **E** at the grate on the north-east pavement. If you dare.
+- **Intro:** run the `xmasintro` command to watch the camera tour. **Backspace** skips it.
 - **Light ceremony:** runs on its own at 18:00, 20:00 and 22:00 game time if your server uses Renewed-Weathersync. Staff can also start it with the `xmasceremony` command (ace `command.xmasceremony`).
 
 </details>
@@ -112,6 +124,7 @@ All textures are conveniently packed into YTD files, making them easy to modify,
 <summary><b>Heads up</b></summary>
 
 This map replaces the hill court and road above Mirror Park. If you're running another map in that same spot, they're going to fight, and nobody wins.
+The Legion folder rebuilds Legion Square, so anything else that changes that square will fight with it.
 The trees and streets extras replace the game's own tree, palm and street prop models, so anything else that replaces those will fight with them too.
 
 ```

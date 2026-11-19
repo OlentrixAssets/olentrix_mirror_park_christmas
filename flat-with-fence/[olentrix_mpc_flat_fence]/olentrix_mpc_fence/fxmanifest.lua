@@ -5,11 +5,12 @@ lua54 'yes'
 name 'olentrix_mpc_fence'
 author 'Olentrix Assets'
 description 'Mirror Park Christmas: the fence and gateway round the flat court'
-version '1.5.0'
+version '2.0.0'
 
 this_is_a_map 'yes'
 
 data_file 'DLC_ITYP_REQUEST' 'stream/xv_gate.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/xv_lod.ytyp'
 data_file 'DLC_ITYP_REQUEST' 'stream/xv_pfence_n.ytyp'
 data_file 'DLC_ITYP_REQUEST' 'stream/xv_pfence_p00.ytyp'
 data_file 'DLC_ITYP_REQUEST' 'stream/xv_pfence_p01.ytyp'

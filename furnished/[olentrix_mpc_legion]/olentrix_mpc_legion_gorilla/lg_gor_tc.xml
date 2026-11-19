@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<timecycle_modifier_data version="1.000000">
+  <modifier name="lg_gor_pit" numMods="22" userFlags="0">
+    <light_dir_mult>0.000 1.000</light_dir_mult>
+    <natural_ambient_multiplier>0.000 0.000</natural_ambient_multiplier>
+    <artificial_int_ambient_multiplier>0.000 0.000</artificial_int_ambient_multiplier>
+    <light_amb_down_wrap>0.000 0.000</light_amb_down_wrap>
+    <light_artificial_ext_down_col_r>0.600 1.000</light_artificial_ext_down_col_r>
+    <light_artificial_ext_down_col_g>0.700 1.000</light_artificial_ext_down_col_g>
+    <light_artificial_ext_down_col_b>1.000 1.000</light_artificial_ext_down_col_b>
+    <light_artificial_ext_down_intensity>0.030 0.000</light_artificial_ext_down_intensity>
+    <light_artificial_ext_up_intensity>0.020 0.000</light_artificial_ext_up_intensity>
+    <ped_light_mult>0.000 1.000</ped_light_mult>
+    <light_amb_occ_mult>1.000 0.000</light_amb_occ_mult>
+    <light_amb_volumes_in_diffuse>0.000 0.000</light_amb_volumes_in_diffuse>
+    <postfx_desaturation>0.300 0.000</postfx_desaturation>
+    <postfx_noise>0.250 0.000</postfx_noise>
+    <postfx_noise_size>0.400 0.000</postfx_noise_size>
+    <postfx_intensity_bloom>1.200 0.000</postfx_intensity_bloom>
+    <postfx_vignetting_intensity>0.850 0.000</postfx_vignetting_intensity>
+    <postfx_vignetting_radius>3.500 0.000</postfx_vignetting_radius>
+    <postfx_vignetting_contrast>0.300 0.000</postfx_vignetting_contrast>
+    <fog_hdr>0.000 0.950</fog_hdr>
+    <fog_haze_hdr>0.000 1.000</fog_haze_hdr>
+    <sky_hdr>0.000 0.000</sky_hdr>
+  </modifier>
+</timecycle_modifier_data>

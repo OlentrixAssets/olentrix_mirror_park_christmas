@@ -5,7 +5,7 @@ lua54 'yes'
 name 'olentrix_mpc_ambience'
 author 'Olentrix Assets'
 description 'Mirror Park Christmas: ambience and light ceremony'
-version '1.5.0'
+version '2.0.0'
 
 dependency 'olentrix_mpc_market'
 shared_script 'config.lua'

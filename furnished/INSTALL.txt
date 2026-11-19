@@ -1,4 +1,4 @@
-MIRROR PARK CHRISTMAS v1.5.0 - INSTALL
+MIRROR PARK CHRISTMAS v2.0.0 - INSTALL
 
 1. Copy the [olentrix_mirror_park_christmas] folder into your server's resources folder.
 2. Add this line to server.cfg:
@@ -8,6 +8,9 @@ MIRROR PARK CHRISTMAS v1.5.0 - INSTALL
       ensure olentrix_mpc_houses_snow   (snow for those decorations - only for snowy servers)
       ensure olentrix_mpc_trees         (Christmas lights in the game's trees and palms, map-wide)
       ensure olentrix_mpc_streets       (decorations on street lights and street props, map-wide)
-4. Restart your server.
+4. Legion Square: copy the [olentrix_mpc_legion] folder too and add:
+      ensure [olentrix_mpc_legion]
+   It needs olentrix_mpc_houses from the extras folder.
+5. Restart your server.
 
 No framework is needed. See README on the download page for keys, commands and permissions.

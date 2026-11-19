@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>html, body { margin: 0; background: transparent; }</style>
+</head>
+<body>
+<script>
+let ac = null, gain = null, src = null, buf = null, loading = null, file = null;
+
+function ctx() {
+  if (!ac) {
+    ac = new AudioContext();
+    gain = ac.createGain(); gain.gain.value = 0.9;
+    gain.connect(ac.destination);
+  }
+  if (ac.state === 'suspended') ac.resume();
+  return ac;
+}
+
+function post(name) {
+  fetch('https://' + GetParentResourceName() + '/' + name, { method: 'POST', body: '{}' }).catch(() => {});
+}
+
+function load(f) {
+  if (buf && file === f) return Promise.resolve(buf);
+  if (!loading || file !== f) {
+    file = f;
+    loading = fetch(f).then(r => r.arrayBuffer()).then(b => ctx().decodeAudioData(b)).then(b => (buf = b));
+  }
+  return loading;
+}
+
+function stop() {
+  if (src) { try { src.stop(); } catch (e) {} src.disconnect(); src = null; }
+}
+
+window.addEventListener('message', (e) => {
+  const d = e.data;
+  if (!d || !d.t) return;
+  if (d.t === 'load') {
+    load(d.file).then(() => post('loaded')).catch(() => post('loaded'));
+  } else if (d.t === 'play') {
+    load(d.file).then(b => {
+      stop();
+      const s = ctx().createBufferSource(); s.buffer = b; s.connect(gain); s.start(0); src = s;
+      s.onended = () => { if (src === s) src = null; };
+      post('started');
+    }).catch(() => post('started'));
+  } else if (d.t === 'stop') {
+    stop();
+  }
+});
+</script>
+</body>
+</html>

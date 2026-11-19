@@ -5,7 +5,7 @@ lua54 'yes'
 name 'olentrix_mpc_market'
 author 'Olentrix Assets'
 description 'Mirror Park Christmas: market'
-version '1.5.0'
+version '2.0.0'
 
 this_is_a_map 'yes'
 
@@ -221,6 +221,7 @@ data_file 'DLC_ITYP_REQUEST' 'stream/xv_xtree_a.ytyp'
 data_file 'DLC_ITYP_REQUEST' 'stream/xv_xtree_b.ytyp'
 data_file 'DLC_ITYP_REQUEST' 'stream/xv_xtree_c.ytyp'
 data_file 'DLC_ITYP_REQUEST' 'stream/xv_xtree_d.ytyp'
+data_file 'DLC_ITYP_REQUEST' 'stream/xv_lod.ytyp'
 
 files { 'xv_snowglobe_tc.xml' }
 data_file 'TIMECYCLEMOD_FILE' 'xv_snowglobe_tc.xml'

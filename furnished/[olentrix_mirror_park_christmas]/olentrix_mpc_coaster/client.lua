@@ -55,7 +55,7 @@ local function newCar(tau)
     local p = pose(tau)
     local obj = CreateObjectNoOffset(CAR, p.x, p.y, p.z, false, false, false)
     SetEntityCollision(obj, false, false)
-    SetEntityLodDist(obj, 500)
+    SetEntityLodDist(obj, 200)
     FreezeEntityPosition(obj, true)
     place(obj, tau)
     return obj

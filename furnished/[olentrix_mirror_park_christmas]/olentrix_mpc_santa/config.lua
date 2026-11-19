@@ -174,7 +174,9 @@ Config.Carollers = {
 
 Config.Letters = {
     position = vector3(1312.8, -742.4, 66.17),
-    spots = {},
+    spots = {
+        vector3(164.92, -976.53, 29.2),
+    },
     promptDistance = 2.5,
     reach = 6.0,
     maxLength = 250,
