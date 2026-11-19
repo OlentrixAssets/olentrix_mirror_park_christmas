@@ -4,7 +4,7 @@ game 'gta5'
 name 'olentrix_mpc_ground'
 author 'Olentrix Assets'
 description 'Mirror Park Christmas: court and road'
-version '2.0.0'
+version '2.0.1'
 
 this_is_a_map 'yes'
 

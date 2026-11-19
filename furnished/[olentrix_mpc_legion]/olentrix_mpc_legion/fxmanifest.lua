@@ -5,7 +5,7 @@ lua54 'yes'
 name 'olentrix_mpc_legion'
 author 'Olentrix Assets'
 description 'Mirror Park Christmas: Legion Square Christmas plaza'
-version '2.0.0'
+version '2.0.1'
 
 this_is_a_map 'yes'
 

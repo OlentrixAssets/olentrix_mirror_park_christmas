@@ -5,5 +5,5 @@ lua54 'yes'
 name 'olentrix_mpc_trees'
 author 'Olentrix Assets'
 description 'Mirror Park Christmas: Christmas bulbs in the game trees and palms, every copy on the map (optional add-on)'
-version '2.0.0'
+version '2.0.1'
 
