@@ -127,11 +127,10 @@ local function ride(delay)
     local yaw, pit = 0.0, 0.0
     HardAttachCamToEntity(cam, car, pit, 0.0, yaw, 0.0, -0.35, 1.45, true)
     RenderScriptCams(true, true, 700, true, true)
+    local snd = CSND.new(R, pose, function(m) SendNUIMessage(m) end, { rev = 0.5 })
+    snd:prep()
     SendNUIMessage({ a = 'shot', k = 'bell', v = 0.9 })
     local t0 = GetGameTimer() + delay
-    local nextEv = 1
-    local stage = 'station'
-    local lastMix = 0
     while true do
         local tau = (GetGameTimer() - t0) / 1000.0
         if tau < 0 then tau = 0 end
@@ -141,40 +140,13 @@ local function ride(delay)
         yaw = math.max(-115.0, math.min(115.0, yaw - GetDisabledControlNormal(0, 1) * 6.0))
         pit = math.max(-55.0, math.min(35.0, pit - GetDisabledControlNormal(0, 2) * 6.0))
         HardAttachCamToEntity(cam, car, pit, 0.0, yaw, 0.0, -0.35, 1.45, true)
-        while nextEv <= #R.events and R.events[nextEv][1] <= tau do
-            local k = R.events[nextEv][2]
-            if k == 'launch' or k == 'boost' then SendNUIMessage({ a = 'shot', k = 'launch', v = 1.0 })
-            elseif k == 'portal_out' or k == 'portal_in' then SendNUIMessage({ a = 'shot', k = 'whoosh', v = 0.9 })
-            elseif k == 'open' and stage == 'chain' then SendNUIMessage({ a = 'shot', k = 'sparkle', v = 0.9 })
-            elseif k == 'trim' or k == 'brake' or k == 'otrim' then SendNUIMessage({ a = 'shot', k = 'brake', v = k == 'brake' and 0.9 or 0.6 })
-            end
-            stage = k
-            nextEv = nextEv + 1
-        end
-        if GetGameTimer() - lastMix > 100 then
-            lastMix = GetGameTimer()
-            local v = R.v[i] or 0.0
-            local under = R.under[i] == 1
-            setUnder(under)
-            local moving = tau > 0.2 and tau < R.duration
-            local inPower = stage == 'launch' or stage == 'power'
-            local inChain = stage == 'chain' or stage == 'portal_out'
-            local run = moving and v > 0.6
-            SendNUIMessage({ a = 'mix', l = {
-                roar = { run and math.min(1.0, 0.3 + (v / 22.0) ^ 1.2 + (stage == 'loop' and 0.15 or 0.0)) or 0.0, 0.55 + v / 32.0, 0.0 },
-                rattle = { run and math.min(0.85, 0.15 + v / 30.0) or 0.0, 0.8 + v / 60.0, 0.0 },
-                roll = { moving and math.min(0.7, 0.15 + v / 30.0) or 0.0, 0.7 + v / 28.0, 0.0 },
-                wind = { moving and math.min(1.0, (v / 26.0) ^ 1.5) * (under and 0.35 or 1.0) or 0.0, 0.8 + v / 60.0, 0.0 },
-                power = { inPower and 0.55 or 0.0, 1.0, 0.0 },
-                chain = { (inChain and v < 6.0) and 0.8 or 0.0, math.max(0.6, math.min(1.6, v / 4.5)), 0.0 },
-                tunnel = { (under and moving) and 0.45 or 0.0, 1.0, 0.0 },
-            } })
-        end
+        setUnder(R.under[i] == 1)
+        snd:rider(tau)
         if tau >= R.duration + 0.6 then break end
         Wait(0)
     end
     SendNUIMessage({ a = 'shot', k = 'bell', v = 0.7 })
-    SendNUIMessage({ a = 'stop' })
+    snd:stop('r')
     DetachEntity(ped, true, false)
     SetEntityCoordsNoOffset(ped, R.exit[1], R.exit[2], R.exit[3], false, false, false)
     SetEntityHeading(ped, R.exit[4])
@@ -194,40 +166,22 @@ local function watch(src, delay)
     local car = newCar(0.0)
     if not car then return end
     local clone = sitClone(src, car)
+    local snd = CSND.new(R, pose, function(m) SendNUIMessage(m) end, { id = src })
+    snd:prep()
     local t0 = GetGameTimer() + delay
-    local nextEv, stage, lastMix = 1, 'station', 0
     while true do
         local tau = (GetGameTimer() - t0) / 1000.0
         if tau > R.duration + 0.6 then break end
-        local p, i = place(car, math.max(0.0, tau))
-        while nextEv <= #R.events and R.events[nextEv][1] <= tau do stage = R.events[nextEv][2]; nextEv = nextEv + 1 end
-        if GetGameTimer() - lastMix > 100 then
-            lastMix = GetGameTimer()
-            local cp = GetFinalRenderedCamCoord()
-            local cr = GetFinalRenderedCamRot(2)
-            local d = #(p - cp)
-            local v = R.v[i] or 0.0
-            if riding or d > 230.0 or tau < 0.2 then
-                SendNUIMessage({ a = 'mix', l = { xroar = { 0.0, 1.0 }, xrattle = { 0.0, 1.0 }, xchain = { 0.0, 1.0 } } })
-            else
-                local yaw = math.rad(cr.z)
-                local rx, ry = math.cos(yaw), math.sin(yaw)
-                local dx, dy = (p.x - cp.x) / math.max(d, 0.1), (p.y - cp.y) / math.max(d, 0.1)
-                local pan = math.max(-0.9, math.min(0.9, dx * rx + dy * ry))
-                local fall = math.max(0.0, 1.0 - d / 220.0) ^ 2
-                local hid = (R.under[i] == 1) and 0.15 or 1.0
-                local spd = math.min(1.0, v / 20.0)
-                local inChain = (stage == 'chain' or stage == 'portal_out') and v < 6.0
-                SendNUIMessage({ a = 'mix', l = {
-                    xroar = { v > 0.6 and fall * (0.12 + 0.55 * spd) * hid or 0.0, 0.55 + v / 32.0, pan },
-                    xrattle = { v > 1.5 and fall * 0.3 * spd * hid or 0.0, 0.8 + v / 60.0, pan },
-                    xchain = { inChain and fall * 0.45 or 0.0, math.max(0.6, math.min(1.6, v / 4.5)), pan },
-                } })
-            end
+        local p = place(car, math.max(0.0, tau))
+        local cp = GetFinalRenderedCamCoord()
+        if riding or tau < 0.2 or #(p - cp) > 230.0 then
+            snd:quiet(tau)
+        else
+            snd:watch(tau, cp, GetFinalRenderedCamRot(2))
         end
         Wait(0)
     end
-    SendNUIMessage({ a = 'xstop' })
+    snd:stop('x' .. tostring(src))
     if clone and DoesEntityExist(clone) then DeleteEntity(clone) end
     DeleteEntity(car)
 end

@@ -3,64 +3,223 @@
 <head><meta charset="utf-8"></head>
 <body>
 <script>
-const SRC = {
-  bell: 'audio/cst_bell.ogg', roll: 'audio/cst_roll.ogg', launch: 'audio/cst_launch.ogg', power: 'audio/cst_power.ogg',
-  chain: 'audio/cst_chain.ogg', wind: 'audio/cst_wind.ogg', whoosh: 'audio/cst_whoosh.ogg', brake: 'audio/cst_brake.ogg',
-  sparkle: 'audio/cst_sparkle.ogg', tunnel: 'audio/cst_tunnel.ogg', roar: 'audio/cst_roar.ogg', rattle: 'audio/cst_rattle.ogg'
-};
-const src = (k) => SRC[k] || SRC[k.replace(/^x/, '')];
-let ctx = null;
-function audioCtx() {
-  if (!ctx) { try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { ctx = null; } }
-  if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
+const FILE = {};
+const PRELOAD = ['roar_lo', 'roar_mid', 'roar_hi', 'struct', 'wind_lo', 'wind_hi', 'rattle', 'grind', 'squeal', 'creak', 'boom', 'drive', 'chain_motor', 'whine', 'brake',
+  'joint_1', 'joint_2', 'joint_3', 'joint_4', 'click_1', 'click_2', 'click_3', 'click_4', 'click_5', 'click_6', 'launch', 'whoosh', 'valve', 'clunk', 'lapbar', 'drop', 'land', 'thud', 'bell'];
+const AXLE = 2.6;
+let ctx = null, master = null, conv = null, gbus = null;
+let bufs = {}, loading = {};
+const buses = {};
+let lastMsg = 0;
+
+function tgt(p, v, tc) { try { p.setTargetAtTime(v, ctx.currentTime, tc); } catch (e) { p.value = v; } }
+
+function init() {
+  if (ctx) {
+    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+    return ctx;
+  }
+  try { ctx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 44100 }); } catch (e) { ctx = null; return null; }
+  master = ctx.createGain(); master.gain.value = 0.6;
+  const comp = ctx.createDynamicsCompressor();
+  comp.threshold.value = -10; comp.knee.value = 8; comp.ratio.value = 6; comp.attack.value = 0.004; comp.release.value = 0.15;
+  const clip = ctx.createWaveShaper();
+  const curve = new Float32Array(4097);
+  for (let i = 0; i < curve.length; i++) {
+    const x = (i / 2048) - 1, a = Math.abs(x);
+    curve[i] = a <= 0.8 ? x : Math.sign(x) * (0.8 + 0.18 * Math.tanh((a - 0.8) / 0.18));
+  }
+  clip.curve = curve; clip.oversample = '2x';
+  master.connect(comp); comp.connect(clip); clip.connect(ctx.destination);
+  gbus = ctx.createGain(); gbus.connect(master);
+  conv = ctx.createConvolver();
+  const wet = ctx.createGain(); wet.gain.value = 1.0;
+  conv.connect(wet); wet.connect(master);
+  load('ir_tunnel').then((b) => { if (b) conv.buffer = b; });
   return ctx;
 }
-const loops = {};
-const target = {};
-function loop(k) {
-  if (!loops[k]) {
-    const a = new Audio(src(k));
-    a.loop = true; a.volume = 0; a.preservesPitch = false;
-    const c = audioCtx(); let pan = null;
-    if (c && c.createStereoPanner) {
-      try { const s = c.createMediaElementSource(a); pan = c.createStereoPanner(); s.connect(pan); pan.connect(c.destination); } catch (e) { pan = null; }
+
+function load(k) {
+  if (!ctx) return Promise.resolve(null);
+  if (bufs[k]) return Promise.resolve(bufs[k]);
+  if (loading[k]) return loading[k];
+  loading[k] = fetch('audio/' + (FILE[k] || k) + '.ogg')
+    .then((r) => r.arrayBuffer())
+    .then((a) => new Promise((ok, no) => ctx.decodeAudioData(a, ok, no)))
+    .then((b) => { bufs[k] = b; delete loading[k]; return b; })
+    .catch(() => { delete loading[k]; return null; });
+  return loading[k];
+}
+
+function bus(id) {
+  let b = buses[id];
+  if (b) return b;
+  const inp = ctx.createGain();
+  const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 18000; f.Q.value = 0.5;
+  const dry = ctx.createGain();
+  const send = ctx.createGain(); send.gain.value = 0;
+  inp.connect(f); f.connect(dry); dry.connect(master); f.connect(send); send.connect(conv);
+  b = { id: id, inp: inp, f: f, dry: dry, send: send, layers: {}, s: 0, v: 0, t: 0, jg: 0, ck: 0, js: 8.3, cs: 0.33, nj: null, nc: null, dead: false };
+  buses[id] = b;
+  return b;
+}
+
+function apply(L) {
+  if (!L.ready) return;
+  tgt(L.gn.gain, L.g, 0.06);
+  tgt(L.src.playbackRate, L.r, 0.08);
+  tgt(L.pn.pan, L.p, 0.1);
+}
+
+function layer(b, k) {
+  let L = b.layers[k];
+  if (L) return L;
+  L = { k: k, ready: false, g: 0, r: 1, p: 0, quiet: ctx.currentTime };
+  b.layers[k] = L;
+  load(k).then((buf) => {
+    if (!buf || b.dead || b.layers[k] !== L) return;
+    const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true; src.playbackRate.value = L.r;
+    const g = ctx.createGain(); g.gain.value = 0;
+    const p = ctx.createStereoPanner(); p.pan.value = L.p;
+    src.connect(g); g.connect(p); p.connect(b.inp);
+    src.start(0, Math.random() * buf.duration);
+    L.src = src; L.gn = g; L.pn = p; L.ready = true;
+    apply(L);
+  });
+  return L;
+}
+
+function play(dest, name, when, gain, rate, pan) {
+  const buf = bufs[name];
+  if (!buf) return;
+  const src = ctx.createBufferSource(); src.buffer = buf; src.playbackRate.value = rate;
+  const g = ctx.createGain(); g.gain.value = gain;
+  const p = ctx.createStereoPanner(); p.pan.value = pan;
+  src.connect(g); g.connect(p); p.connect(dest);
+  src.start(Math.max(when, ctx.currentTime));
+}
+
+function mix(d) {
+  if (!init()) return;
+  lastMsg = Date.now();
+  const b = bus(d.b || 'r');
+  b.dead = false;
+  const now = ctx.currentTime;
+  for (const k in d.l) {
+    const e = d.l[k];
+    let L = b.layers[k];
+    if (!L && !(e[0] > 0.004)) continue;
+    if (!L) L = layer(b, k);
+    L.g = e[0]; L.r = e[1] || 1; L.p = e[2] || 0;
+    if (L.g > 0.004) L.quiet = now;
+    apply(L);
+  }
+  if (d.lp) tgt(b.f.frequency, d.lp, 0.15);
+  if (d.rev !== undefined) tgt(b.send.gain, d.rev, 0.3);
+  b.v = d.mv || 0; b.s = d.ms || 0; b.t = now;
+  b.jg = d.jg || 0; b.ck = d.ck || 0; b.js = d.js || 8.3; b.cs = d.cs || 0.33; b.pan = d.mp || 0;
+}
+
+function shot(d) {
+  if (!init()) return;
+  lastMsg = Date.now();
+  const dest = d.b === 'r' ? bus('r').inp : gbus;
+  load(d.k).then((buf) => {
+    if (!buf) return;
+    play(dest, d.k, ctx.currentTime, Math.max(0, Math.min(1, d.v === undefined ? 1 : d.v)), d.r || 1, d.p || 0);
+  });
+}
+
+function stop(id) {
+  const b = buses[id];
+  if (!b) return;
+  b.dead = true;
+  for (const k in b.layers) {
+    const L = b.layers[k];
+    L.g = 0;
+    apply(L);
+  }
+  tgt(b.send.gain, 0, 0.4);
+  setTimeout(() => {
+    for (const k in b.layers) {
+      const L = b.layers[k];
+      if (L.ready) { try { L.src.stop(); } catch (e) {} L.src.disconnect(); L.gn.disconnect(); L.pn.disconnect(); }
     }
-    a.play().catch(() => {});
-    loops[k] = { a: a, pan: pan }; target[k] = 0;
-  }
-  return loops[k];
+    try { b.inp.disconnect(); b.f.disconnect(); b.dry.disconnect(); b.send.disconnect(); } catch (e) {}
+    if (buses[id] === b) delete buses[id];
+  }, 1600);
 }
-function shot(k, v) {
-  const a = new Audio(src(k));
-  a.volume = Math.max(0, Math.min(1, v === undefined ? 1 : v));
-  a.play().catch(() => {});
+
+function prep() {
+  if (!init()) return;
+  lastMsg = Date.now();
+  PRELOAD.forEach((k) => load(k));
 }
-setInterval(() => {
-  for (const k in loops) {
-    const a = loops[k].a;
-    const t = target[k] || 0;
-    a.volume = Math.max(0, Math.min(1, a.volume + (t - a.volume) * 0.25));
-    if (t <= 0 && a.volume < 0.01) { a.pause(); delete loops[k]; delete target[k]; }
+
+function pick(prefix, n) { return prefix + '_' + (1 + Math.floor(Math.random() * n)); }
+
+function sched() {
+  if (!ctx) return;
+  const now = ctx.currentTime;
+  for (const id in buses) {
+    const b = buses[id];
+    if (!b.t || b.dead) continue;
+    const age = now - b.t;
+    if (age > 0.6) { b.jg = 0; b.ck = 0; }
+    const s = b.s + b.v * Math.min(age, 0.3);
+    if (b.v > 1.2 && b.jg > 0.01) {
+      if (b.nj === null || b.nj > s + b.js * 3) b.nj = s + b.js * 0.5;
+      let n = 0;
+      while (s >= b.nj && n++ < 4) {
+        const when = b.t + (b.nj - b.s) / b.v;
+        if (Math.random() > 0.1) {
+          const g = b.jg * (0.65 + 0.35 * Math.random()), r = 0.92 + 0.18 * Math.random(), name = pick('joint', 4);
+          play(b.inp, name, when, g, r, b.pan * 0.5);
+          play(b.inp, pick('joint', 4), when + AXLE / Math.max(b.v, 2.0), g * 0.8, r * (0.95 + 0.1 * Math.random()), b.pan * 0.5);
+        }
+        b.nj += b.js * (0.88 + 0.24 * Math.random());
+      }
+    } else b.nj = null;
+    if (b.v > 0.4 && b.ck > 0.01) {
+      if (b.nc === null || b.nc > s + b.cs * 6) b.nc = s + b.cs * 0.5;
+      let n = 0;
+      while (s >= b.nc && n++ < 6) {
+        const when = b.t + (b.nc - b.s) / b.v;
+        play(b.inp, pick('click', 6), when, b.ck * (0.55 + 0.45 * Math.random()), 0.95 + 0.12 * Math.random(), b.pan * 0.5);
+        b.nc += b.cs * (0.8 + 0.4 * Math.random());
+      }
+    } else b.nc = null;
   }
-}, 50);
-window.addEventListener('message', (e) => {
-  const d = e.data || {};
-  if (d.a === 'shot') shot(d.k, d.v);
-  else if (d.a === 'mix') {
-    for (const k in d.l) {
-      const v = d.l[k][0], r = d.l[k][1], p = d.l[k][2];
-      if (v > 0 || loops[k]) {
-        const L = loop(k);
-        target[k] = Math.max(0, Math.min(1, v));
-        if (r) L.a.playbackRate = Math.max(0.5, Math.min(2.0, r));
-        if (L.pan && p !== undefined) L.pan.pan.value = Math.max(-1, Math.min(1, p));
+}
+
+function tidy() {
+  if (!ctx) return;
+  const now = ctx.currentTime;
+  for (const id in buses) {
+    const b = buses[id];
+    for (const k in b.layers) {
+      const L = b.layers[k];
+      if (L.g <= 0.004 && now - L.quiet > 1.5) {
+        if (L.ready) { try { L.src.stop(); } catch (e) {} L.src.disconnect(); L.gn.disconnect(); L.pn.disconnect(); }
+        delete b.layers[k];
       }
     }
-  } else if (d.a === 'stop') {
-    for (const k in target) if (k[0] !== 'x') target[k] = 0;
-  } else if (d.a === 'xstop') {
-    for (const k in target) if (k[0] === 'x') target[k] = 0;
   }
+  if (Date.now() - lastMsg > 45000 && Object.keys(buses).length === 0) {
+    bufs = {}; loading = {};
+    if (ctx.state === 'running') ctx.suspend().catch(() => {});
+  }
+}
+
+setInterval(sched, 25);
+setInterval(tidy, 1000);
+
+window.addEventListener('message', (e) => {
+  const d = e.data || {};
+  if (d.a === 'mix') mix(d);
+  else if (d.a === 'shot') shot(d);
+  else if (d.a === 'stop') stop(d.b || 'r');
+  else if (d.a === 'prep') prep();
 });
 </script>
 </body>
