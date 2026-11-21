@@ -5,7 +5,7 @@ lua54 'yes'
 name 'olentrix_mpc_skating'
 author 'Olentrix Assets'
 description 'Mirror Park Christmas: buy ice skates and skate on the rink'
-version '2.0.1'
+version '2.0.2'
 
 dependency 'olentrix_mpc_skatekit'
 

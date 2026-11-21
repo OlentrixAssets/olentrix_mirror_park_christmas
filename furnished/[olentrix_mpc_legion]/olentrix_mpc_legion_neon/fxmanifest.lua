@@ -5,7 +5,7 @@ lua54 'yes'
 name 'olentrix_mpc_legion_neon'
 author 'Olentrix Assets'
 description 'Mirror Park Christmas: Legion Square neon lights on the beat of the plaza music'
-version '2.0.1'
+version '2.0.2'
 
 this_is_a_map 'yes'
 

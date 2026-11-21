@@ -5,7 +5,7 @@ lua54 'yes'
 name 'olentrix_mpc_legion_life'
 author 'Olentrix Assets'
 description 'Mirror Park Christmas: Legion Square snowball corner, plaza music and seats'
-version '2.0.1'
+version '2.0.2'
 
 dependencies {
     'olentrix_mpc_legion'

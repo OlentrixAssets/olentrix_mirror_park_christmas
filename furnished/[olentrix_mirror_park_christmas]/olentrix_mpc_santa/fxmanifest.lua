@@ -5,7 +5,7 @@ lua54 'yes'
 name 'olentrix_mpc_santa'
 author 'Olentrix Assets'
 description 'Mirror Park Christmas: the grotto, carol singers and letters to Santa'
-version '2.0.1'
+version '2.0.2'
 
 dependency 'olentrix_mpc_market'
 
