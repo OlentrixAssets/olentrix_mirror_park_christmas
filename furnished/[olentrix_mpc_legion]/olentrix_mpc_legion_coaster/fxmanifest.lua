@@ -5,7 +5,7 @@ lua54 'yes'
 name 'olentrix_mpc_legion_coaster'
 author 'Olentrix Assets'
 description 'Mirror Park Christmas: the Legion Plunge coaster under Legion Square'
-version '2.0.2'
+version '2.0.3'
 
 this_is_a_map 'yes'
 

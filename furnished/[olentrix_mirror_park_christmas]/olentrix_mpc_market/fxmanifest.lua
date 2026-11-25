@@ -5,7 +5,7 @@ lua54 'yes'
 name 'olentrix_mpc_market'
 author 'Olentrix Assets'
 description 'Mirror Park Christmas: market'
-version '2.0.2'
+version '2.0.3'
 
 this_is_a_map 'yes'
 

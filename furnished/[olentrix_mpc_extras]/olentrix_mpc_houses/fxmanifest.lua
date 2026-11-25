@@ -5,7 +5,7 @@ lua54 'yes'
 name 'olentrix_mpc_houses'
 author 'Olentrix Assets'
 description 'Mirror Park Christmas: houses, streets, bridges and city squares dressed for Christmas (optional add-on)'
-version '2.0.2'
+version '2.0.3'
 
 this_is_a_map 'yes'
 

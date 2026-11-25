@@ -5,7 +5,7 @@ lua54 'yes'
 name 'olentrix_mpc_fence'
 author 'Olentrix Assets'
 description 'Mirror Park Christmas: the fence and gateway round the flat court'
-version '2.0.2'
+version '2.0.3'
 
 this_is_a_map 'yes'
 
