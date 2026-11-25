@@ -4,6 +4,10 @@ Welcome to Mirror Park Christmas.
 
 A Christmas village on the hill above Mirror Park: market cabins, an ice rink, a Ferris wheel, a steam train, a snow globe hidden in the hill, a sleigh coaster to get you back out, and Santa himself. Downtown, Legion Square gets the same treatment, with a coaster underneath it.
 
+![](images/1.png)
+
+**[Watch the video](images/video.mp4)**
+
 > [!CAUTION]
 > **STILL BEING WORKED ON.** This map is a work in progress and things will keep changing.
 > If you're going to complain that it isn't ready, don't use it yet.
@@ -54,6 +58,15 @@ Or hit **Code → Download ZIP** to grab all four map versions, each in its own 
 /tp 1372.00, -735.00, 66.60
 /tp 196.24, -933.36, 29.20
 ```
+
+</details>
+
+<details>
+<summary><b>Preview</b></summary>
+
+![](images/2.png)
+![](images/3.png)
+![](images/4.png)
 
 </details>
 
